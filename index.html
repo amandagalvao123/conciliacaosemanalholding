@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Conciliação bancária semanal do Grupo Ragga — extrato × contas a pagar, por conta e por período.">
+<title>Conciliação Ragga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ink:#1B1733; --ink-2:#4A4568; --ink-3:#7B7796;
+  --ground:#F4F4F8; --surface:#FFFFFF; --surface-2:#EDEDF4; --line:#DEDEE9;
+  --roxo:#2D204E; --accent:#2D204E; --accent-soft:#EAE6F5;
+  --ok:#1F7A4D; --ok-soft:#E1F3E9;
+  --warn:#B4600A; --warn-soft:#FBEEDC;
+  --crit:#B81A20; --crit-soft:#FAE4E5;
+  --shadow:0 1px 2px rgba(27,23,51,.05), 0 8px 24px -12px rgba(27,23,51,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#EEEDF6; --ink-2:#B4B0CC; --ink-3:#807C9C;
+    --ground:#131120; --surface:#1D1A2E; --surface-2:#272339; --line:#332E4B;
+    --roxo:#B9A6E8; --accent:#B9A6E8; --accent-soft:#2A2444;
+    --ok:#6FD39E; --ok-soft:#173226;
+    --warn:#E8A951; --warn-soft:#33260F;
+    --crit:#F08A8E; --crit-soft:#3A1B1D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#EEEDF6; --ink-2:#B4B0CC; --ink-3:#807C9C;
+  --ground:#131120; --surface:#1D1A2E; --surface-2:#272339; --line:#332E4B;
+  --roxo:#B9A6E8; --accent:#B9A6E8; --accent-soft:#2A2444;
+  --ok:#6FD39E; --ok-soft:#173226;
+  --warn:#E8A951; --warn-soft:#33260F;
+  --crit:#F08A8E; --crit-soft:#3A1B1D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"DM Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.money,.dt{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+.wrap{max-width:1280px;margin:0 auto;padding:18px;display:flex;flex-direction:column;gap:18px}
+
+/* topo */
+.topbar{background:var(--surface);border-radius:26px;padding:18px 20px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:16px}
+.idrow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.mark{display:inline-flex;align-items:center;gap:10px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:20px;letter-spacing:-.01em}
+.logo{width:36px;height:36px;flex:0 0 36px;background-color:var(--accent);
+  -webkit-mask:url("data:image/png;base64,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") no-repeat center/contain;
+  mask:url("data:image/png;base64,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") no-repeat center/contain}
+.mark small{display:block;font-family:"DM Sans",sans-serif;font-size:11px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.tab{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:99px;
+  padding:9px 16px;font-family:"DM Sans",sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:8px;transition:background .15s,color .15s,border-color .15s}
+.tab:hover{color:var(--ink)}
+.tab.on{background:var(--accent);border-color:transparent;color:#fff;font-weight:700}
+:root[data-theme="dark"] .tab.on,:root:not([data-theme="light"]) .tab.on{color:#151226}
+.tab .bul{width:7px;height:7px;border-radius:99px;background:currentColor;opacity:.55}
+.periodos{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;align-items:center}
+.plabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700;white-space:nowrap;margin-right:4px}
+.per{border:1px solid var(--line);background:transparent;color:var(--ink-3);border-radius:12px;padding:7px 13px;
+  font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.per:hover{color:var(--ink)}
+.per.on{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:700}
+button:focus-visible,a:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.head{background:linear-gradient(135deg,#2D204E,#1a1230 72%);border-radius:26px;padding:26px 28px;color:#F1EEF9;box-shadow:var(--shadow)}
+.head .eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#A99BD4;font-weight:700;margin:0 0 6px}
+.head h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(23px,3.3vw,33px);margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance}
+.head p{margin:0;color:#C9C0E4;font-size:14px;max-width:66ch}
+.headmeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.1);color:#EAE5F7;font-size:12.5px;font-weight:500}
+.chip b{font-family:"JetBrains Mono",monospace;font-weight:700}
+
+.card{background:var(--surface);border-radius:26px;padding:24px 26px;box-shadow:var(--shadow)}
+h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:21px;margin:0 0 4px;letter-spacing:-.015em}
+.sub{color:var(--ink-3);font-size:13px;margin:0 0 20px;max-width:82ch}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:var(--surface-2);border-radius:18px;padding:16px}
+.kpi.hero{background:var(--ok-soft)}
+.kpi .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:8px}
+.kpi.hero .k{color:var(--ok)}
+.kpi .v{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.kpi.hero .v{color:var(--ok)}
+.kpi.warn .v{color:var(--warn)} .kpi.crit .v{color:var(--crit)}
+.kpi .d{font-size:12px;color:var(--ink-3);margin-top:5px}
+
+.amarr{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:14px}
+.amarr .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 16px;border-bottom:1px solid var(--line);font-size:14px}
+.amarr .row:last-child{border-bottom:0}
+.amarr .lbl{color:var(--ink-2)}
+.amarr .lbl small{display:block;color:var(--ink-3);font-size:11.5px}
+.amarr .val{font-family:"JetBrains Mono",monospace;font-weight:500;white-space:nowrap}
+.amarr .row.tot{background:var(--surface-2);font-weight:700}
+.amarr .row.key{background:var(--ok-soft)}
+.amarr .row.key .lbl,.amarr .row.key .val{color:var(--ok);font-weight:700}
+.neg{color:var(--crit)} .pos{color:var(--ok)}
+
+.tw{overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:680px}
+thead th{background:var(--surface-2);color:var(--ink-3);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;text-align:left;padding:10px 14px;white-space:nowrap}
+tbody td,tfoot td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+td.money{white-space:nowrap;font-weight:500}
+td.dt{color:var(--ink-3);white-space:nowrap;font-size:12.5px}
+td .note{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px;max-width:46ch}
+.tag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap}
+.t-ok{background:var(--ok-soft);color:var(--ok)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-crit{background:var(--crit-soft);color:var(--crit)}
+.t-neutral{background:var(--surface-2);color:var(--ink-3)}
+tr.rowcrit{background:var(--crit-soft)} tr.rowwarn{background:var(--warn-soft)}
+tfoot tr{background:var(--surface-2);font-weight:700}
+
+tr.parent{cursor:pointer} tr.parent:hover{background:var(--surface-2)}
+.disc{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:7px;
+  background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;margin-right:8px;flex:0 0 20px;
+  transition:transform .18s;font-family:"JetBrains Mono",monospace}
+tr.parent.open .disc{transform:rotate(90deg)}
+.fornline{display:flex;align-items:flex-start}
+.fornline>div{min-width:0}
+tr.child>td{padding:0;border-top:0;background:var(--surface-2)}
+.drill{padding:14px 18px 16px}
+.drill h5{margin:0 0 3px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.drill .how{margin:0 0 12px;font-size:12.5px;color:var(--ink-3);max-width:84ch}
+.dtab{width:100%;border-collapse:collapse;font-size:12.5px;min-width:0}
+.dtab td{padding:7px 10px;border-top:1px solid var(--line);background:transparent}
+.dtab tr:first-child td{border-top:0}
+.dtab tr.dtot td{font-weight:700;color:var(--ok);border-top:2px solid var(--ok)}
+.hint{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);margin-bottom:12px}
+.hint .disc{margin:0}
+
+.divs{display:flex;flex-direction:column;gap:14px}
+.dv{display:flex;gap:14px;padding:18px;border-radius:18px;background:var(--surface-2)}
+.dv .stripe{width:4px;border-radius:99px;flex:0 0 4px;background:var(--ink-3)}
+.dv.warn .stripe{background:var(--warn)} .dv.crit .stripe{background:var(--crit)} .dv.ok .stripe{background:var(--ok)}
+.dv h3{margin:0 0 5px;font-size:15px;font-weight:700;display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.dv p{margin:0 0 8px;font-size:13.5px;color:var(--ink-2);max-width:84ch}
+.dv p:last-child{margin-bottom:0}
+.dv .acao{font-size:12.5px;color:var(--ink-3)}
+.dv .acao b{color:var(--ink-2)}
+
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:150px 1fr 104px;gap:12px;align-items:center;font-size:12.5px}
+.bar .bl{color:var(--ink-3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .track{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar .fill{height:100%;border-radius:99px;background:var(--accent);min-width:3px}
+.bar .bv{text-align:right;font-family:"JetBrains Mono",monospace;font-weight:600;white-space:nowrap}
+
+.wppbox{background:var(--surface-2);border-radius:18px;padding:18px;position:relative}
+.wppbox pre{margin:0;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-wrap:break-word;color:var(--ink-2)}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:12px;padding:6px 12px;
+  font-family:"DM Sans",sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.copybtn{position:absolute;top:12px;right:12px}
+
+.rowhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin-bottom:16px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:99px;font-size:12px;font-weight:600;
+  background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.pill.live{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.off{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.empty{padding:34px 20px;text-align:center;color:var(--ink-3);font-size:13px;background:var(--surface-2);border-radius:18px}
+.empty b{display:block;color:var(--ink-2);font-size:14px;margin-bottom:5px}
+
+.contagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.conta{background:var(--surface-2);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;
+  cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.conta:hover{border-color:var(--line)}
+.conta .ct{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+.conta .ct .cd{width:9px;height:9px;border-radius:99px;flex:0 0 9px}
+.conta .cs{font-size:11.5px;color:var(--ink-3);margin-top:-8px}
+.conta .cg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.conta .cg div{min-width:0}
+.conta .cg .l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.conta .cg .n{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px;margin-top:2px}
+.pendlist{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+.pendlist li{margin-bottom:6px}
+
+/* pendências clicáveis + modal */
+.pendgrp{margin:20px 0 0}
+.pendgrp .gt{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin-bottom:9px}
+.pendgrp .gt .cd{width:9px;height:9px;border-radius:99px;flex:0 0 9px}
+.pendlist2{display:flex;flex-direction:column;gap:8px}
+.pendrow{display:flex;gap:12px;align-items:stretch;padding:12px 14px;border-radius:14px;background:var(--surface-2);
+  cursor:pointer;border:1px solid transparent;text-align:left;font:inherit;color:inherit;width:100%;
+  transition:border-color .15s,background .15s}
+.pendrow:hover{border-color:var(--line)}
+.pendrow .sev{width:4px;border-radius:99px;flex:0 0 4px;background:var(--warn)}
+.pendrow.crit .sev{background:var(--crit)}
+.pendrow .pb{flex:1;min-width:0}
+.pendrow .pt{font-size:13.5px;font-weight:600;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pendrow .pd{font-size:12px;color:var(--ink-3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pendrow .arw{align-self:center;color:var(--ink-3);font-family:"JetBrains Mono",monospace;font-size:14px;flex:0 0 auto}
+
+.ovl{position:fixed;inset:0;background:rgba(18,15,34,.6);display:flex;align-items:center;justify-content:center;
+  padding:20px;z-index:60}
+.modal{background:var(--surface);border-radius:24px;max-width:660px;width:100%;max-height:84vh;overflow:auto;
+  box-shadow:0 24px 70px -22px rgba(0,0,0,.55);padding:24px 26px 26px}
+.modal .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px}
+.modal .mconta{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;color:var(--ink-3)}
+.modal .mconta .cd{width:8px;height:8px;border-radius:99px;flex:0 0 8px}
+.modal h3{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;margin:6px 0 0;letter-spacing:-.015em;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;text-wrap:balance}
+.modal p{font-size:14px;color:var(--ink-2);margin:0 0 10px;max-width:none}
+.modal .acaobox{background:var(--surface-2);border-radius:16px;padding:14px 16px;margin-top:16px}
+.modal .acaobox .al{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:5px}
+.modal .acaobox p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.modal .mfoot{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.xbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:12px;
+  width:32px;height:32px;flex:0 0 32px;cursor:pointer;font-size:16px;line-height:1;font-family:inherit}
+.xbtn:hover{background:var(--crit-soft);color:var(--crit);border-color:transparent}
+@media (max-width:880px){ .modal{padding:18px 16px 20px;border-radius:20px;max-height:88vh} }
+footer{color:var(--ink-3);font-size:12px;padding:4px 8px 20px;text-align:center}
+
+@media (max-width:880px){
+  .wrap{padding:12px;gap:12px}
+  .card,.head,.topbar{padding:18px 16px;border-radius:22px}
+  .kpi .v{font-size:20px}
+  .bar{grid-template-columns:104px 1fr 92px;gap:8px}
+  .conta .cg{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+<style>
+:root{color-scheme:light dark}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="idrow">
+      <span class="mark"><span class="logo" id="markDot" role="img" aria-label="Grupo Ragga"></span><span>Conciliação Ragga<small id="markSub">Fechamento bancário semanal</small></span></span>
+      <span class="pill" id="dbStatus">Carregando…</span>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="periodos" id="periodos"><span class="plabel">Período</span></div>
+  </div>
+  <div id="view"></div>
+  <footer>Conciliação bancária semanal · Grupo Ragga Foods · Assessoria de Presidência</footer>
+</div>
+<script>
+var SEED=[{"id":"avi-2026-09-14","ordem":20260914,"conta":"avi","contaLabel":"AVI","contaDetalhe":"Vespa Distribuidora · Sicredi 65745-8","cor":"#D4A010","razaoSocial":"AVI Distribuidora de Alimentos e Hortifruti Ltda","periodoLabel":"14–18/09/2026","periodoInicio":"2026-09-14","periodoFim":"2026-09-18","emitido":"2026-09-21","semana":38,"chamada":"85 registros confrontados com 140 lançamentos do extrato. A conciliação fechou centavo a centavo: toda a diferença é tarifa bancária não cadastrada. O ponto crítico da semana não é divergência — é o saldo.","alerta":{"titulo":"A conta fechou a semana em R$ 7,89","tag":"Liquidez","paras":["A AVI entrou na semana com R$ 114.379,56, recebeu R$ 81.608,01 e pagou R$ 195.979,68. O saldo caiu 99,99% em cinco dias e a posição disponível em 21/09 é de R$ 6,69. Não é erro de conciliação — os números batem. É exposição: qualquer débito não previsto na segunda entra em saldo negativo."],"acao":"Travar a programação de pagamentos da AVI ao recebimento das lojas, e não ao vencimento. Nesta semana R$ 6.605,66 saíram fora do fluxo planejado exatamente no dia em que a conta zerou."},"saldoAnterior":114379.56,"debitos":195979.68,"creditos":81608.01,"saldoFinal":7.89,"saldoInformado":6.69,"totalCP":195821.6,"debitoLiquido":195821.6,"diferenca":0.0,"registros":85,"conciliados":85,"lancamentos":140,"tarifasTotal":158.08,"creditosLojas":71476.22,"creditosCobranca":10131.79,"cobertura":0.416,"favorecidoDivergente":35,"kpis":[{"k":"Conciliado","v":"85 / 85","d":"100% dos registros localizados","tone":"hero"},{"k":"Contas a pagar","v":"195.821,60","d":"Registrado e marcado como pago"},{"k":"Débitos operacionais","v":"195.821,60","d":"Diferença zero"},{"k":"Tarifas sem registro","v":"158,08","d":"10 lançamentos bancários","tone":"crit"}],"leitura":[{"txt":"Registros conciliados com o extrato","nota":"Valor e data batendo, um débito para cada registro","n":"85","valor":195821.6,"tag":"Conciliado","tone":"ok"},{"txt":"Tarifas bancárias sem registro","nota":"Manutenção e baixa de títulos, maquininha, cesta","n":"10","valor":158.08,"tag":"A cadastrar","tone":"crit"},{"txt":"Registros sem lançamento no banco","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Divergências de valor ou data","n":"0","valor":null,"tag":"Nenhuma","tone":"neutral"},{"txt":"Pagamentos com favorecido diferente do cadastro","nota":"Valores corretos; o nome no banco não é o do fornecedor registrado","n":"35","valor":96089.17,"tag":"Cadastro","tone":"warn"}],"amarracao":[[{"lbl":"Saldo anterior","sub":"posição em 13/09/2026","val":114379.56},{"lbl":"(+) Créditos do período","sub":"44 PIX das lojas + 1 liquidação de cobrança","val":81608.01,"tone":"pos"},{"lbl":"(−) Débitos do período","sub":"95 lançamentos","val":195979.68,"tone":"neg"},{"lbl":"= Saldo em 18/09/2026","val":7.89,"tipo":"tot"},{"lbl":"Saldo disponível informado em 21/09/2026","val":6.69},{"lbl":"Diferença a identificar","sub":"movimentação entre 19/09 e 21/09","val":1.2,"tone":"warnv"}],[{"lbl":"Débitos totais no banco","val":195979.68},{"lbl":"(−) Tarifas bancárias","sub":"10 lançamentos, nenhum registrado","val":158.08,"tone":"neg"},{"lbl":"= Débitos operacionais","val":195821.6},{"lbl":"(−) Total registrado em contas a pagar","val":195821.6},{"lbl":"= Diferença","val":0.0,"tipo":"key"}]],"saldoDia":[["13/09",114379.56],["14/09",113592.17],["15/09",87751.88],["16/09",73690.04],["17/09",40529.47],["18/09",7.89]],"entradas":{"kpis":[{"k":"Total recebido","v":"81.608,01","d":"45 créditos"},{"k":"Repasses das lojas","v":"71.476,22","d":"44 PIX · 88% das entradas"},{"k":"Cobrança simples","v":"10.131,79","d":"Liquidação em 14/09"},{"k":"Cobertura dos pagamentos","v":"41,6%","d":"Entradas ÷ saídas da semana","tone":"warn"}],"lojas":[{"loja":"SICA FOODS","n":4,"v":10767.78},{"loja":"AGAPE FOODS","n":4,"v":9316.29},{"loja":"LANA FOODS","n":4,"v":7739.47},{"loja":"PANTI FOODS","n":3,"v":4949.01},{"loja":"JAPI FOODS","n":4,"v":4423.68},{"loja":"BRUTI FOODS","n":3,"v":4076.51},{"loja":"CHEMA FOODS","n":2,"v":3805.86},{"loja":"MADRI FOODS","n":4,"v":3792.37},{"loja":"ELMA FOODS","n":3,"v":3364.68},{"loja":"MARTI FOODS","n":2,"v":3342.5},{"loja":"DEMAQUI FOODS","n":2,"v":3334.09},{"loja":"LUAMA FOODS COMER","n":1,"v":3160.07},{"loja":"FUSI FOODS","n":2,"v":2887.77},{"loja":"RAMA FOODS","n":1,"v":2312.93},{"loja":"PIGUI FOODS","n":2,"v":2243.88},{"loja":"VERI FOODS","n":1,"v":1084.58},{"loja":"NEMAOM FOODS","n":2,"v":874.75}]},"depara":[{"dt":"14/09","f":"FRIGOLON","cc":"CMV","ext":"CONSTANTINO E S","extDoc":"Boleto · 10.213.265/0001-21","v":23498.91,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"LEVO","cc":"CMV","ext":"PLUSVAL AGROAVI","extDoc":"Boleto · 35.030.372/0001-45","v":6445.0,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"FIBRAFORM","cc":"CMV","ext":"FIBRAFORM","extDoc":"Boleto · 10.655.578/0001-30","v":6131.1,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"POSTO AEROPORTO","cc":"DESP.OPERACIONAIS","ext":"PERUSSOLO E AND","extDoc":"Boleto · 32.392.253/0001-44","v":5749.41,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"FACAO","cc":"CMV","ext":"JOSE LUIZ SILVERIO","extDoc":"Boleto · 039.961.898-85","v":3700.0,"tone":"crit","tag":"Confirmar"},{"dt":"14/09","f":"FRIGOLON","cc":"CMV","ext":"CONSTANTINO E S","extDoc":"Boleto · 10.213.265/0001-21","v":2432.05,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"NS FRUTAS","cc":"CMV","ext":"NS FRUTAS LTDA","extDoc":"Boleto · 30.986.052/0001-40","v":2100.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"LUKACHAKI","cc":"CMV","ext":"REAL FORTE FOME","extDoc":"Boleto · 04.275.671/0001-16","v":1906.25,"tone":"crit","tag":"Confirmar"},{"dt":"14/09","f":"LIBREPLAST","cc":"CMV","ext":"LIBREPLAST INDU","extDoc":"Boleto · 10.237.146/0001-09","v":1707.42,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"FACAO","cc":"CMV","ext":"JOAO BATISTA SILVE","extDoc":"Boleto · 624.114.548-72","v":1260.0,"tone":"crit","tag":"Confirmar"},{"dt":"14/09","f":"MARCO ATACADO","cc":"CMV","ext":"CARLOS","extDoc":"Boleto · 07.583.481/0001-54","v":1122.84,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"BRITO FORNER HORTIFRUTI","cc":"CMV","ext":"PATRICIA PAULA FORNER","extDoc":"PIX · 046.235.199-88","v":1120.0,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"PERSONALIZE PAPEIS","cc":"CMV","ext":"PERSONALIZE PAP","extDoc":"Boleto · 10.678.646/0001-86","v":1115.1,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"POLENGHI","cc":"CMV","ext":"CARLOS RA FARIA","extDoc":"Boleto · 09.091.444/0001-54","v":690.0,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"ARY COMERCIO DE FRUTAS","cc":"CMV","ext":"ARY COMERCIO DE","extDoc":"Boleto · 11.360.721/0001-29","v":540.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"JAUBERT","cc":"CMV","ext":"JAUBERT E RODRI","extDoc":"Boleto · 03.980.245/0001-10","v":525.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"ALFASEG","cc":"CMV","ext":"ALFASEG COMERCI","extDoc":"Boleto · 04.521.504/0001-08","v":474.4,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"GALIZA","cc":"CMV","ext":"GALIZA DISTRIBU","extDoc":"Boleto · 01.221.369/0001-97","v":432.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"BUSCAPE UNIFORMES","cc":"DESP.OPERACIONAIS","ext":"BUSCAPE UNIFORMES L","extDoc":"PIX · 48.360.988/0001-26","v":270.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"LIMINAL","cc":"CMV","ext":"LIMINAL COM GEN","extDoc":"Boleto · 72.147.366/0001-07","v":264.63,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"PROLAR","cc":"DESPESAS GERAIS","ext":"PROLAR DISTRIBU","extDoc":"Boleto · 75.731.422/0001-36","v":247.4,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"AC SILVA","cc":"CMV","ext":"A C DA SILVA CO","extDoc":"Boleto · 11.545.198/0002-96","v":240.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"ROUXINOL","cc":"CMV","ext":"COMERCIAL ROUXI","extDoc":"Boleto · 39.360.207/0001-02","v":131.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"M.C GIACOMELLO","cc":"CMV","ext":"M C GIA","extDoc":"Boleto · 11.343.325/0001-93","v":128.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"MARCIA CRISTINA CARDOSO","cc":"FREELANCER","ext":"GABRIEL JORGE CARDOSO","extDoc":"PIX · 094.215.539-42","v":120.0,"tone":"crit","tag":"Confirmar"},{"dt":"14/09","f":"MARLUCI DE SOUZA","cc":"FREELANCER","ext":"MARLUCI DE SOUZA","extDoc":"PIX · 097.114.298-02","v":120.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"PROLAR","cc":"DESPESAS GERAIS","ext":"PROLAR DISTRIBU","extDoc":"Boleto · 75.731.422/0001-36","v":67.05,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"HORTIFRUTI SERRA","cc":"CMV","ext":"T SERRA","extDoc":"Boleto · 42.233.630/0001-56","v":45.0,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"LONDRIFRANGOS","cc":"CMV","ext":"LONDRIF","extDoc":"Boleto · 28.809.653/0001-35","v":7848.39,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"FRIGOLON","cc":"CMV","ext":"CONSTANTINO E S","extDoc":"Boleto · 10.213.265/0001-21","v":7773.1,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"ESA","cc":"ENERGIA","ext":"ESA CAPITAL E ENERG","extDoc":"PIX · 41.813.358/0001-10","v":4249.2,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"MULTIPLAST","cc":"CMV","ext":"MULTIPLAST COME","extDoc":"Boleto · 67.212.972/0001-10","v":1390.0,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"SR BACON","cc":"CMV","ext":"D K C PRODUCAO","extDoc":"Boleto · 36.714.450/0002-74","v":1123.75,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"SO UNIFORMES EXPRESS","cc":"DESP.OPERACIONAIS","ext":"Heber Rodrigues da Sil","extDoc":"PIX · 020.287.299-88","v":980.0,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"EMBALON EMBALAGENS","cc":"CMV","ext":"D BORIN DE JESU","extDoc":"Boleto · 24.119.285/0001-42","v":918.2,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"CLAUDIR MENDES","cc":"CMV","ext":"CLAUDIR MENDES","extDoc":"PIX · 026.387.339-03","v":420.0,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"CLEANPAR","cc":"DESPESAS GERAIS","ext":"CLEANPAR APUC H","extDoc":"Boleto · 48.952.813/0001-08","v":303.45,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"LAVA RAPIDO PAULISTA","cc":"CMV","ext":"FERNANDO VIEIRA DA SIL","extDoc":"PIX · 412.736.228-63","v":250.0,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"MARCIA CRISTINA CARDOSO","cc":"FREELANCER","ext":"GABRIEL JORGE CARDOSO","extDoc":"PIX · 094.215.539-42","v":240.0,"tone":"crit","tag":"Confirmar"},{"dt":"15/09","f":"PONTO TRACK","cc":"CMV","ext":"ARBUS TECNOLOGI","extDoc":"Boleto · 54.361.981/0001-21","v":159.8,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"RZ FOODS","cc":"CMV","ext":"RZ FOODS","extDoc":"PIX · 58.506.112/0001-07","v":88.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"COMERCIAL DE ALIMENTOS UNIQUE","cc":"CMV","ext":"COMERCIAL DE AL","extDoc":"Boleto · 21.557.819/0001-24","v":9519.8,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"DIFRIPAR","cc":"CMV","ext":"DIFRIPA","extDoc":"Boleto · 74.017.930/0001-94","v":5747.41,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"ALIMENTO FEIJAO DE OURO","cc":"CMV","ext":"ALIMENTOS DE OU","extDoc":"Boleto · 77.934.503/0001-69","v":4630.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"DIFRIPAR","cc":"CMV","ext":"DIFRIPA","extDoc":"Boleto · 74.017.930/0001-94","v":4590.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"DIFRIPAR","cc":"CMV","ext":"DIFRIPA","extDoc":"Boleto · 74.017.930/0001-94","v":2721.68,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"CELESTINOS","cc":"CMV","ext":"J APARECIDO CEL","extDoc":"Boleto · 40.602.407/0001-03","v":2054.9,"tone":"warn","tag":"Nome divergente"},{"dt":"16/09","f":"NS FRUTAS","cc":"CMV","ext":"NS FRUTAS LTDA","extDoc":"Boleto · 30.986.052/0001-40","v":1950.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"A C DA SILVA","cc":"CMV","ext":"A C DA SILVA CO","extDoc":"Boleto · 11.545.198/0002-96","v":605.94,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"TERRA VERMELHA","cc":"CMV","ext":"AGROIND","extDoc":"Boleto · 05.764.307/0001-82","v":528.04,"tone":"warn","tag":"Nome divergente"},{"dt":"16/09","f":"ARILU DISTRIBUIDORA","cc":"CMV","ext":"ARILU DISTRIBUI","extDoc":"Boleto · 79.151.502/0001-73","v":450.02,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"ALIMENTOS WILSON","cc":"CMV","ext":"RED S A","extDoc":"Boleto · 67.915.785/0001-01","v":403.81,"tone":"crit","tag":"Confirmar"},{"dt":"16/09","f":"M.C GIACOMELLO","cc":"CMV","ext":"M C GIA","extDoc":"Boleto · 11.343.325/0001-93","v":207.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"SUPER AR","cc":"MANUTENCAO","ext":"ALISON APARECID","extDoc":"Boleto · 47.946.734/0001-21","v":180.0,"tone":"warn","tag":"Nome divergente"},{"dt":"16/09","f":"MARCIA CRISTINA CARDOSO","cc":"FREELANCER","ext":"GABRIEL JORGE CARDOSO","extDoc":"PIX · 094.215.539-42","v":120.0,"tone":"crit","tag":"Confirmar"},{"dt":"16/09","f":"MARLUCI DE SOUZA","cc":"FREELANCER","ext":"MARLUCI DE SOUZA","extDoc":"PIX · 097.114.298-02","v":120.0,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"FRIMESA","cc":"CMV","ext":"FRIMESA COOPERA","extDoc":"Boleto · 77.595.395/0001-47","v":15590.4,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"LEVO","cc":"CMV","ext":"PLUSVAL AGROAVI","extDoc":"Boleto · 35.030.372/0001-45","v":6916.0,"tone":"warn","tag":"Nome divergente"},{"dt":"17/09","f":"FRIMESA","cc":"CMV","ext":"FRIMESA COOPERA","extDoc":"Boleto · 77.595.395/0001-47","v":3452.78,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"SOUZA E BAUM","cc":"CMV","ext":"SOUZA BAUM LTDA","extDoc":"Boleto · 63.059.078/0001-00","v":1402.0,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"FRIMESA","cc":"CMV","ext":"FRIMESA COOPERA","extDoc":"Boleto · 77.595.395/0001-47","v":1264.8,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"FACAO","cc":"CMV","ext":"JOSE LUIZ SILVERIO","extDoc":"Boleto · 039.961.898-85","v":1100.0,"tone":"crit","tag":"Confirmar"},{"dt":"17/09","f":"OESA / DELLYS","cc":"CMV","ext":"OESA COMERCIO E","extDoc":"Boleto · 81.611.931/0001-28","v":1030.19,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"BRITO FORNER HORTIFRUTI","cc":"CMV","ext":"PATRICIA PAULA FORNER","extDoc":"PIX · 046.235.199-88","v":735.0,"tone":"warn","tag":"Nome divergente"},{"dt":"17/09","f":"LEA KEIKO","cc":"CMV","ext":"LÉA KEIKO SHINOHATA KA","extDoc":"PIX · 019.975.879-47","v":640.0,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"JAUBERT","cc":"CMV","ext":"JAUBERT E RODRI","extDoc":"Boleto · 03.980.245/0001-10","v":525.0,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"ALFASEG","cc":"CMV","ext":"ALFASEG COMERCIO DE","extDoc":"PIX · 04.521.504/0001-08","v":499.0,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"BARRACAO VESPA - EXP.CAMBE","cc":"ALUGUEL","ext":"S E ADMINISTRADORA","extDoc":"PIX · 11.487.476/0001-15","v":13000.0,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"LEVO","cc":"CMV","ext":"PLUSVAL AGROAVI","extDoc":"Boleto · 35.030.372/0001-45","v":7914.0,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"CONSTANTINO E SENTINELLO","cc":"CMV","ext":"CONSTANTINO E S","extDoc":"Boleto · 10.213.265/0001-21","v":3384.34,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"LUKACHAKI","cc":"CMV","ext":"REAL FORTE FOME","extDoc":"Boleto · 04.275.671/0001-16","v":2483.34,"tone":"crit","tag":"Confirmar"},{"dt":"18/09","f":"LUKACHAKI","cc":"CMV","ext":"REAL FORTE FOME","extDoc":"Boleto · 04.275.671/0001-16","v":2108.75,"tone":"crit","tag":"Confirmar"},{"dt":"18/09","f":"FERNANDA LIMA","cc":"CMV","ext":"FERNANDA LIMA DE FARIA","extDoc":"PIX · 063.177.999-03","v":1750.0,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"FGTS FOLHA","cc":"IMPOSTO","ext":"CEF MATRIZ","extDoc":"PIX · 00.360.305/0001-04","v":1605.69,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"SANTA LUCIA","cc":"CMV","ext":"LATICINIOS SANT","extDoc":"Boleto · 03.943.004/0003-63","v":1471.32,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"EMBALON EMBALAGENS","cc":"CMV","ext":"D BORIN DE JESU","extDoc":"Boleto · 24.119.285/0001-42","v":1318.4,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"JUNIOR","cc":"CMV","ext":"RENATO GERMANO","extDoc":"Boleto · 31.519.027/0001-19","v":1253.0,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"CLAUDECIR PEREIRA DE LIMA","cc":"SALARIO","ext":"Claudecir Pereira de L","extDoc":"PIX · 023.950.254-02","v":910.08,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"DIEGO ROCHA DE ARAUJO","cc":"SALARIO","ext":"DIEGO ROCHA DE ARAUJO","extDoc":"PIX · 089.345.049-94","v":910.08,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"NUTRIBELLA","cc":"CMV","ext":"NUTRIBE","extDoc":"Boleto · 10.725.503/0001-88","v":780.0,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"VITORIA FRUTAS MERCADAO","cc":"CMV","ext":"M V COMERCIO DE","extDoc":"Boleto · 57.227.769/0001-64","v":625.0,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"A C DA SILVA","cc":"CMV","ext":"A C DA SILVA CO","extDoc":"Boleto · 11.545.198/0002-96","v":480.0,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"ROUXINOL","cc":"CMV","ext":"COMERCIAL ROUXI","extDoc":"Boleto · 39.360.207/0001-02","v":320.0,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"MACRO VIDA","cc":"CMV","ext":"GOUVEA DELIVERY LTD","extDoc":"PIX · 47.444.103/0001-04","v":134.08,"tone":"crit","tag":"Confirmar"},{"dt":"18/09","f":"PROLAR","cc":"DESPESAS GERAIS","ext":"PROLAR DISTRIBU","extDoc":"Boleto · 75.731.422/0001-36","v":63.3,"tone":"ok","tag":"OK"}],"semRegistro":[{"dt":"14/09","d":"MANUTENCAO DE TITULOS","v":12.0,"nat":"Carteira de cobrança"},{"dt":"14/09","d":"TARIFA BAIXA DE TITULOS","v":4.2,"nat":"Carteira de cobrança"},{"dt":"14/09","d":"ALUGUEL MAQ CARTOES","v":8.88,"nat":"Maquininha"},{"dt":"15/09","d":"MANUTENCAO DE TITULOS","v":9.0,"nat":"Carteira de cobrança"},{"dt":"15/09","d":"TARIFA BAIXA DE TITULOS","v":8.4,"nat":"Carteira de cobrança"},{"dt":"15/09","d":"CESTA DE RELACIONAMENTO","v":79.0,"nat":"Pacote de serviços"},{"dt":"16/09","d":"MANUTENCAO DE TITULOS","v":12.0,"nat":"Carteira de cobrança"},{"dt":"16/09","d":"TARIFA BAIXA DE TITULOS","v":9.0,"nat":"Carteira de cobrança"},{"dt":"17/09","d":"MANUTENCAO DE TITULOS","v":5.4,"nat":"Carteira de cobrança"},{"dt":"18/09","d":"MANUTENCAO DE TITULOS","v":10.2,"nat":"Carteira de cobrança"}],"divergencias":[{"tier":"crit","titulo":"Pagamentos fora do fluxo planejado","tag":"R$ 6.605,66","paras":["Três registros de 18/09 têm na própria descrição a marca de que entraram fora da programação: Santa Lúcia R$ 1.471,32 e Constantino e Sentinello R$ 3.384,34 (\"compra parcelada, não me atentei na data do vencimento\") e Fernanda Lima R$ 1.750,00 (\"recebido a mercadoria após fechamento financeiro da semana\"). Saíram no mesmo dia em que a conta foi a R$ 7,89."],"acao":"Nas compras parceladas, lançar todas as parcelas no momento da compra. Mercadoria recebida após o fechamento entra na programação da semana seguinte, salvo autorização."},{"tier":"crit","titulo":"Tarifas bancárias fora do contas a pagar","tag":"R$ 158,08","paras":["Dez lançamentos, de R$ 4,20 a R$ 79,00, nenhum cadastrado — 100% da diferença da semana. Manutenção de títulos (R$ 48,60) e tarifa de baixa (R$ 21,60) vêm do volume de boletos da AVI: cerca de R$ 79 por semana que a RETI não tem, algo como R$ 4.100 por ano invisíveis no contas a pagar."],"acao":"Criar centro de custo \"Tarifas bancárias\" e lançar as tarifas semanalmente. Cesta e maquininha entram como recorrentes mensais."},{"tier":"crit","titulo":"Facão pago a dois CPFs diferentes","tag":"R$ 1.260,00","paras":["O fornecedor FACÃO teve três pagamentos na semana. Dois foram para José Luiz Silvério (CPF 039.961.898-85): R$ 3.700,00 e R$ 1.100,00. O de R$ 1.260,00, em 14/09, foi para João Batista Silvério (CPF 624.114.548-72) — outra pessoa, outro documento, mesmo fornecedor no cadastro."],"acao":"Confirmar se são dois fornecedores distintos usando o mesmo apelido. Se forem, separar o cadastro."},{"tier":"crit","titulo":"Boletos da Lukachaki cedidos a factoring","tag":"R$ 6.498,34","paras":["Os três boletos da Lukachaki (R$ 1.906,25 · 2.108,75 · 2.483,34) foram liquidados em nome da Real Forte Fomento Mercantil (CNPJ 04.275.671/0001-16). O fornecedor cedeu os títulos, então o pagamento quita a duplicata mas o dinheiro não vai para ele."],"acao":"Registrar a cessão no cadastro da Lukachaki e guardar o aceite. Em cessão de crédito, pagar ao fornecedor original não quita a dívida."},{"tier":"crit","titulo":"Freelancers cadastrados em nome de outra pessoa","tag":"R$ 480,00","paras":["Quatro pagamentos estão registrados como Márcia Cristina Cardoso, mas os PIX saíram para Gabriel Jorge Cardoso Varasckim, CPF 094.215.539-42, via chave de telefone. A própria descrição do registro já traz o nome do Gabriel."],"acao":"Cadastrar o Gabriel como fornecedor próprio. Freelancer pago por chave de telefone em nome de terceiro é ponto de auditoria."},{"tier":"warn","titulo":"Dois casos de razão social sem relação aparente","tag":"R$ 537,89","paras":["Alimentos Wilson → boleto liquidado em nome de RED S.A. (CNPJ 67.915.785/0001-01), R$ 403,81. Macro Vida → PIX para Gouvêa Delivery Ltda (CNPJ 47.444.103/0001-04), R$ 134,08."],"acao":"Confirmar a razão social de cada um e gravar o CNPJ no cadastro."},{"tier":"warn","titulo":"Razão social × nome fantasia","tag":"24 casos","paras":["Frigolon → Constantino e Sentinello, Levo → Plusval Agroavícola, Barracão Vespa → S E Administradora, Sr Bacon → D.K.C., Embalon → D. Borin de Jesus, Celestinos → J. Aparecido, Ponto Track → Arbus, Super Ar → Alison Aparecido, Polenghi → Carlos R. A. Farias, Brito Forner → Patrícia Paula Forner, entre outros. Todos com valor e data corretos."],"acao":"Gravar razão social e CNPJ no cadastro. Isso sozinho automatiza o de-para pelo documento."},{"tier":"warn","titulo":"Coluna de descrição deslocada na planilha","tag":"Qualidade do dado","paras":["Na planilha de contas a pagar, a razão social da coluna DESCRIÇÃO é a do fornecedor da linha seguinte, não a da própria linha. O deslocamento vale para toda a planilha."],"acao":"Corrigir a exportação. Com a razão social na linha certa, o confronto de nome deixa de ser manual."},{"tier":"warn","titulo":"Concentração em poucos fornecedores","tag":"Exposição","paras":["Frigolon (Constantino e Sentinello) concentra R$ 37.088,40 na semana, 18,9% de tudo que saiu, em 4 pagamentos. Frimesa soma R$ 20.307,98 e Levo R$ 21.275,00. Os três juntos passam de 40% do desembolso."],"acao":"Acompanhar prazo médio e condição comercial dos três — são eles que determinam o caixa semanal da distribuidora."},{"tier":"neutral","titulo":"Cesta empresarial já agendada","tag":"R$ 79,00 · 15/10","paras":["O extrato traz nos lançamentos futuros a cesta empresarial 02 de R$ 79,00 para 15/10/2026."],"acao":"Já lançar no contas a pagar de outubro."},{"tier":"neutral","titulo":"Diferença de R$ 1,20 no saldo informado","tag":"Fora da janela","paras":["O extrato acumula R$ 7,89 em 18/09 e o disponível em 21/09 é R$ 6,69. A RETI apresentou o mesmo padrão, com R$ 1,00."],"acao":"Incluir 19/09 a 21/09 na conciliação da próxima semana, nas duas contas."}],"pendencias":9,"pendenciasAbertas":["Saldo fechou a semana em R$ 7,89 — travar programação ao recebimento das lojas","R$ 6.605,66 pagos fora do fluxo planejado em 18/09","Tarifas R$ 158,08 em 10 lançamentos sem registro","Facão: R$ 1.260,00 a João Batista Silvério e R$ 4.800,00 a José Luiz Silvério","Lukachaki: R$ 6.498,34 à Real Forte Fomento — registrar cessão de crédito","Freelancers cadastrados como Márcia Cristina e pagos a Gabriel Jorge Cardoso","35 de 85 pagamentos com favorecido diferente do cadastro","Planilha com coluna DESCRIÇÃO deslocada uma linha","Saldo em 21/09 R$ 1,20 abaixo — conciliar 19 a 21/09"],"wpp":"*CONCILIAÇÃO SEMANAL — AVI (Vespa Distribuidora)*\nPeríodo: 14/09 a 18/09/2026 · Conta Sicredi 65745-8\n\n*Resultado:* 85 de 85 registros conciliados. Zero divergência de valor e de data.\n\n• Contas a pagar registrado: R$ 195.821,60\n• Débitos operacionais no banco: R$ 195.821,60\n• Diferença: R$ 158,08 — só tarifas bancárias sem cadastro\n\n*ATENÇÃO — CAIXA:*\nA conta fechou a semana em *R$ 7,89*. Entrou com R$ 114.379,56, recebeu R$ 81.608,01 das lojas e pagou R$ 195.979,68. As entradas cobriram 41,6% das saídas.\n\n*Pontos para tratar:*\n1. R$ 6.605,66 saíram fora do fluxo planejado em 18/09 — duas compras parceladas sem atenção ao vencimento e uma mercadoria recebida após o fechamento\n2. Tarifas R$ 158,08 (10 lançamentos) sem registro — criar centro de custo Tarifas Bancárias\n3. *Facão* teve R$ 1.260,00 pago a João Batista Silvério e os outros dois a José Luiz Silvério — confirmar\n4. Boletos da *Lukachaki* (R$ 6.498,34) liquidados pela Real Forte Fomento — títulos cedidos a factoring\n5. Freelancers cadastrados como Márcia Cristina mas pagos a Gabriel Jorge Cardoso (R$ 480,00)\n6. 35 de 85 pagamentos com favorecido diferente do cadastro\n7. Planilha do contas a pagar com a coluna DESCRIÇÃO deslocada uma linha"},{"id":"marlay-2026-09-14","ordem":20260914,"conta":"marlay","contaLabel":"MARLAY","contaDetalhe":"ML Consultoria · Sicredi 66328-3","cor":"#5B3E8E","razaoSocial":"ML Consultoria em Food Service Ltda","periodoLabel":"14–18/09/2026","periodoInicio":"2026-09-14","periodoFim":"2026-09-18","emitido":"2026-09-21","semana":38,"chamada":"25 registros confrontados com 113 lançamentos do extrato. Todos os registros foram localizados. A semana tem duas diferenças pequenas — uma tarifa e R$ 1,16 num IPTU — e uma leitura de estrutura que importa mais do que elas: 76% do desembolso é sócio e investimento, não operação.","saldoAnterior":34805.84,"debitos":132294.36,"creditos":173482.76,"saldoFinal":75994.24,"saldoInformado":75994.24,"totalCP":132256.02,"debitoLiquido":132254.86,"diferenca":40.66,"registros":25,"conciliados":25,"lancamentos":113,"tarifasTotal":39.5,"creditosLojas":70351.7,"resgate":103131.06,"kpis":[{"k":"Conciliado","v":"25 / 25","d":"100% dos registros localizados","tone":"hero"},{"k":"Contas a pagar","v":"132.256,02","d":"Registrado e marcado como pago"},{"k":"Débitos operacionais","v":"132.254,86","d":"Débitos menos a tarifa"},{"k":"Diferenças","v":"40,66","d":"Tarifa R$ 39,50 + IPTU R$ 1,16","tone":"warn"}],"leitura":[{"txt":"Conciliados 1:1 com o extrato","nota":"Mesmo valor e mesma data","n":"23","valor":125181.7,"tag":"Conciliado","tone":"ok"},{"txt":"Conciliado com ajuste de forma de pagamento","nota":"Terras do Paraná: um registro em dois boletos iguais","n":"1","valor":6476.68,"tag":"Conciliado","tone":"ok"},{"txt":"Divergência de valor pago × registrado","nota":"IPTU Rolândia — registrado R$ 597,64, pago R$ 596,48","n":"1","valor":1.16,"tag":"Ajustar","tone":"crit"},{"txt":"Lançamento do banco sem registro","nota":"Cesta de relacionamento — 15/09","n":"1","valor":39.5,"tag":"A cadastrar","tone":"crit"},{"txt":"Registros sem lançamento no banco","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Pagamentos com favorecido diferente do cadastro","nota":"Cadastro por obra/unidade, não por fornecedor","n":"13","valor":31059.56,"tag":"Cadastro","tone":"warn"}],"amarracao":[[{"lbl":"Saldo anterior","sub":"posição em 13/09/2026","val":34805.84},{"lbl":"(+) Resgate de aplicação","sub":"14/09 — captação de fundos","val":103131.06,"tone":"pos"},{"lbl":"(+) Repasses das lojas","sub":"85 PIX recebidos na semana","val":70351.7,"tone":"pos"},{"lbl":"(−) Débitos do período","sub":"27 lançamentos","val":132294.36,"tone":"neg"},{"lbl":"= Saldo em 18/09/2026","val":75994.24,"tipo":"tot"},{"lbl":"Saldo disponível informado em 21/09/2026","val":75994.24}],[{"lbl":"Débitos totais no banco","val":132294.36},{"lbl":"(−) Cesta de relacionamento","sub":"tarifa sem registro","val":39.5,"tone":"neg"},{"lbl":"= Débitos operacionais","val":132254.86},{"lbl":"(−) Total registrado em contas a pagar","val":132256.02},{"lbl":"= Diferença","sub":"IPTU de Rolândia registrado a maior","val":1.16,"tipo":"key"}]],"saldoDia":[["13/09",34805.84],["14/09",120444.01],["15/09",51405.79],["16/09",61229.34],["17/09",68390.22],["18/09",75994.24]],"entradas":{"kpis":[{"k":"Total recebido","v":"173.482,76","d":"86 créditos"},{"k":"Resgate de aplicação","v":"103.131,06","d":"59,4% das entradas · 14/09"},{"k":"Repasses das lojas","v":"70.351,70","d":"85 PIX"},{"k":"Saldo sem o resgate","v":"−27.136,82","d":"A conta teria fechado negativa","tone":"crit"}],"lojas":[]},"depara":[{"dt":"14/09","f":"Sunset Dream","cc":"Investimento · Quadra B lote 19","ext":"Boleto Sunset Dream Empreendimentos","extDoc":"Boleto · 43.543.592/0001-09","v":12313.71,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"Pepito Burger — Exp. Paranaguá","cc":"Expansão · porcelanato 4/4","ext":"Boleto Prisma Revestimentos","extDoc":"Boleto · 02.418.279/0001-53","v":6286.12,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"Sunset Dream","cc":"Investimento · Quadra B lote 01 · 29/100","ext":"Boleto Sunset Dream Empreendimentos","extDoc":"Boleto · 43.543.592/0001-09","v":3851.63,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"Sunset Dream","cc":"Investimento · Quadra A lote 01 · 29/100","ext":"Boleto Sunset Dream Empreendimentos","extDoc":"Boleto · 43.543.592/0001-09","v":3028.22,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"Unimed","cc":"Sócio · plano de saúde","ext":"Boleto Unimed de Londrina","extDoc":"Boleto · 75.222.224/0001-47","v":2045.22,"tone":"ok","tag":"OK","nota":"Gecionil, Gabriel e João"},{"dt":"14/09","f":"Biggs 13 — Exp. Arthur Thomas","cc":"Expansão · material de construção 4/6","ext":"Boleto Eletro Conduluz","extDoc":"Boleto · 49.297.223/0001-51","v":1475.0,"tone":"warn","tag":"Nome divergente"},{"dt":"14/09","f":"Central de Delivery","cc":"Expansão · obra da laje","ext":"PIX Charles Ferreira Tenório","extDoc":"PIX · 080.084.489-03","v":1300.0,"tone":"warn","tag":"Nome divergente","nota":"Prestador Charles — chave de telefone"},{"dt":"14/09","f":"Allianz Seguros","cc":"Sócio · seguro 6/6","ext":"Boleto Allianz Seguros","extDoc":"Boleto · 61.573.796/0001-66","v":849.02,"tone":"ok","tag":"OK","nota":"Renovação Jeep Compass (CNPJ Polak)"},{"dt":"14/09","f":"Amanda Galvão","cc":"Cartão PF · reembolso","ext":"PIX Amanda Galvão Antunes","extDoc":"PIX · 130.954.619-33","v":414.28,"tone":"ok","tag":"OK","nota":"Parcelas MSC Cruzeiros 05/12"},{"dt":"15/09","f":"Yticon","cc":"Sócio · imóvel · entrada","ext":"Boleto Yticon Construtora e Incorporadora","extDoc":"Boleto · 10.910.748/0001-85","v":70000.0,"tone":"crit","tag":"Ver nota","nota":"Financiamento direto do apartamento do Alexandre — 52,9% do desembolso da semana"},{"dt":"15/09","f":"Terras do Paraná","cc":"Investimento · Tayaya aptos 609 e 819","ext":"Dois boletos Terras do Paraná","extDoc":"Boleto · 41.331.457/0001-66","v":6476.68,"tone":"warn","tag":"Ver detalhe","nota":"Registro único liquidado em dois boletos iguais","how":"Nenhum débito isolado de 6.476,68. Em 15/09 há dois boletos do mesmo CNPJ, de 3.238,34 cada, que somados dão o valor exato do registro — um por apartamento.","det":[{"d":"Boleto Terras do Paraná — apto 609","doc":"41.331.457/0001-66","v":3238.34},{"d":"Boleto Terras do Paraná — apto 819","doc":"41.331.457/0001-66","v":3238.34}]},{"dt":"15/09","f":"Vasco da Gama","cc":"Expansão · pintura 1/2","ext":"PIX Deann Diego da Silva Prudêncio","extDoc":"PIX · 082.359.959-05","v":3300.0,"tone":"warn","tag":"Nome divergente","nota":"Pintura de forro, pilares e testeira"},{"dt":"15/09","f":"Mapoli","cc":"Expansão · iluminação 3/4","ext":"Boleto Eletro Conduluz","extDoc":"Boleto · 49.297.223/0001-51","v":1250.0,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"Instituto Filadélfia","cc":"Sócio · faculdade","ext":"Boleto Instituto Filadélfia","extDoc":"Boleto · 78.624.202/0001-00","v":1024.2,"tone":"ok","tag":"OK","nota":"Faculdade Maria Eduarda"},{"dt":"15/09","f":"Terras de Canaã","cc":"Investimento · IPTU 7/10","ext":"Boleto Prefeitura de Cambé — IPTU","extDoc":"Boleto · 75.732.057/0001-84","v":612.8,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"Galileu 1 — Exp. Camélia","cc":"Expansão · alarme","ext":"Boleto Alarm Systems","extDoc":"Boleto · 02.743.970/0001-02","v":298.0,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"Pepito Burger — Exp. Paranaguá","cc":"Expansão · usina","ext":"PIX ESA Capital e Energia","extDoc":"PIX · 41.813.358/0001-10","v":107.4,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"Sunset Mall — Matuza","cc":"Expansão · iluminação · entrada","ext":"PIX LOGG Comércio Import. e Export.","extDoc":"PIX · 22.919.191/0001-22","v":4246.81,"tone":"warn","tag":"Nome divergente","nota":"Iluminação da praça e dos salões da Churrascaria Matuza"},{"dt":"17/09","f":"Contabilidade","cc":"Reset · alteração de endereço 4/4","ext":"PIX Metrópole Apoio Administrativo","extDoc":"PIX · 51.492.863/0001-64","v":3675.0,"tone":"warn","tag":"Nome divergente"},{"dt":"17/09","f":"Mapoli","cc":"Expansão · pratos personalizados 2/2","ext":"PIX PLB Porcelana","extDoc":"PIX · 18.139.666/0001-90","v":2638.0,"tone":"warn","tag":"Nome divergente"},{"dt":"17/09","f":"Biggs e Isaías — Exp. Rolândia","cc":"Expansão · IPTU","ext":"Boleto Município de Rolândia","extDoc":"Boleto · 76.288.760/0001-08","v":597.64,"vpago":596.48,"tone":"crit","tag":"Valor divergente","nota":"Registrado R$ 597,64 · pago R$ 596,48 — diferença de R$ 1,16"},{"dt":"18/09","f":"Biggs 13 — Exp. Arthur Thomas","cc":"Expansão · equipamentos 6/7","ext":"Boleto Prolar Distribuidora","extDoc":"Boleto · 75.731.422/0001-36","v":3480.99,"tone":"warn","tag":"Nome divergente","nota":"Utensílios, equipamentos e materiais da unidade"},{"dt":"18/09","f":"Pepito","cc":"Expansão · marcenaria","ext":"PIX Luan da Silva Oliveira","extDoc":"PIX · 073.219.919-03","v":2500.0,"tone":"warn","tag":"Nome divergente","nota":"Móvel em madeira de peroba"},{"dt":"18/09","f":"Mapoli","cc":"Expansão · locação de andaime","ext":"PIX A. Mozzaquatro Comércio de Ferramentas","extDoc":"PIX · 27.743.611/0001-86","v":282.0,"tone":"warn","tag":"Nome divergente"},{"dt":"18/09","f":"FGTS folha","cc":"Sócio · imposto","ext":"PIX CEF Matriz","extDoc":"PIX · 00.360.305/0001-04","v":203.3,"tone":"ok","tag":"OK","nota":"FGTS ML"}],"semRegistro":[{"dt":"15/09","d":"Cesta de relacionamento","v":39.5,"nat":"Pacote de serviços"}],"anexos":[{"titulo":"Composição do desembolso por centro de custo","sub":"Onde os R$ 132.256,02 da semana foram aplicados. A leitura por centro de custo é o que diferencia esta conta das demais: ela não é operacional.","cols":["Centro de custo","Registros","Valor","% da semana","Natureza"],"aligns":["","r","r","r",""],"rows":[["Sócio","5","74.121,74","56,0%","crit:Pessoal"],["Expansão","13","27.761,96","21,0%","ok:Operacional"],["Investimento","5","26.283,04","19,9%","crit:Patrimonial"],["Reset","1","3.675,00","2,8%","ok:Operacional"],["Cartão PF","1","414,28","0,3%","crit:Pessoal"]],"foot":["Total","25","132.256,02","100%",""]}],"divergencias":[{"tier":"crit","titulo":"Três quartos da semana não são operação","tag":"R$ 100.819,06 · 76,2%","paras":["Sócio (R$ 74.121,74), Investimento (R$ 26.283,04) e Cartão PF (R$ 414,28) somam 76,2% do desembolso. Dentro disso, a entrada do apartamento do Alexandre na Yticon, de R$ 70.000,00, sozinha representa 52,9% de tudo que saiu da conta na semana. A operação — Expansão e Reset — responde por 23,8%.","A conta recebeu R$ 70.351,70 em repasses das 17 lojas no mesmo período. Ou seja, dinheiro que entrou como repasse operacional saiu, na mesma semana, para faculdade, plano de saúde, seguro de veículo, lotes e imóvel de sócio."],"acao":"Definir e registrar o enquadramento dessas saídas — distribuição de lucros, pró-labore ou mútuo com o sócio. Sem esse enquadramento formal, o valor fica como saída sem contrapartida contábil, o que afeta a apuração do resultado e é exatamente o tipo de item que aparece primeiro numa fiscalização ou numa due diligence."},{"tier":"crit","titulo":"A conta só fechou positiva por causa do resgate","tag":"R$ 103.131,06","paras":["Sem o resgate de aplicação de 14/09, a semana teria fechado em R$ 27.136,82 negativos: R$ 34.805,84 de saldo inicial mais R$ 70.351,70 de repasses contra R$ 132.294,36 de pagamentos. O resgate cobriu, quase exatamente, a entrada de R$ 70.000,00 da Yticon."],"acao":"Registrar o resgate no fluxo de caixa como origem do pagamento do imóvel, para a leitura da semana não sugerir que a operação gerou esse caixa."},{"tier":"crit","titulo":"IPTU de Rolândia pago a menor que o registrado","tag":"R$ 1,16","paras":["O contas a pagar registra R$ 597,64 para o IPTU de Biggs e Isaías — Exp. Rolândia, mas o boleto do Município de Rolândia foi liquidado por R$ 596,48. É a única divergência de valor da semana."],"acao":"Ajustar o registro para o valor pago. Se a diferença for desconto de pontualidade, vale registrar como tal em vez de deixar como resíduo."},{"tier":"crit","titulo":"Tarifa bancária fora do contas a pagar","tag":"R$ 39,50","paras":["A cesta de relacionamento de 15/09 não tem registro. A mesma tarifa já aparece agendada para 15/10 nos lançamentos futuros do extrato. Nesta conta ela custa metade do que custa na RETI e na AVI (R$ 79,00)."],"acao":"Cadastrar como recorrente mensal. Vale checar por que as outras duas contas pagam o dobro — pode haver pacote diferente contratado."},{"tier":"warn","titulo":"Cadastro por obra, favorecido por fornecedor","tag":"13 casos","paras":["O contas a pagar desta conta registra pela obra ou unidade (Mapoli, Pepito, Biggs 13, Vasco da Gama, Central de Delivery), enquanto o extrato traz o fornecedor (Eletro Conduluz, PLB Porcelana, Prolar, LOGG, Mozzaquatro, Deann Diego, Luan, Charles). Faz sentido para gestão de obra, mas significa que nenhum nome bate direto.","Dois fornecedores aparecem em obras diferentes: Eletro Conduluz atende Biggs 13 (R$ 1.475,00) e Mapoli (R$ 1.250,00); a Prolar aparece aqui e também na AVI."],"acao":"Manter o centro de custo por obra, mas acrescentar um campo de fornecedor com CNPJ. Sem isso, a conciliação desta conta continua dependendo de leitura manual da descrição."},{"tier":"warn","titulo":"Prestadores de obra pagos por chave de telefone","tag":"R$ 7.100,00","paras":["Charles (R$ 1.300,00), Deann Diego (R$ 3.300,00) e Luan (R$ 2.500,00) foram pagos por PIX de chave de telefone, para CPF, com escopo de serviço descrito no registro mas sem indicação de nota fiscal."],"acao":"Confirmar se há nota ou recibo para cada um. Serviço de obra pago a pessoa física sem documento é passivo trabalhista e fiscal potencial."},{"tier":"neutral","titulo":"Cesta empresarial já agendada","tag":"R$ 39,50 · 15/10","paras":["O extrato traz nos lançamentos futuros a cesta empresarial 02 para 15/10/2026."],"acao":"Já lançar no contas a pagar de outubro."},{"tier":"ok","titulo":"Saldo do extrato bate com o informado","tag":"Sem resíduo","paras":["Diferente da RETI (R$ 1,00) e da AVI (R$ 1,20), aqui o saldo acumulado em 18/09 é idêntico ao disponível informado em 21/09: R$ 75.994,24. Não houve movimentação entre 19 e 21/09."],"acao":"Nenhuma."}],"pendencias":6,"pendenciasAbertas":["Enquadrar as saídas de sócio e investimento (R$ 100.819,06) como distribuição, pró-labore ou mútuo","Registrar o resgate de R$ 103.131,06 como origem do pagamento do imóvel Yticon","Ajustar o IPTU de Rolândia: registrado R$ 597,64, pago R$ 596,48","Cesta de relacionamento R$ 39,50 sem registro — cadastrar como recorrente","Conferir nota ou recibo dos prestadores de obra pagos por PIX a CPF (R$ 7.100,00)","Acrescentar campo de fornecedor com CNPJ ao cadastro por obra"],"wpp":"*CONCILIAÇÃO SEMANAL — MARLAY (ML Consultoria)*\nPeríodo: 14/09 a 18/09/2026 · Conta Sicredi 66328-3\n\n*Resultado:* 25 de 25 registros conciliados.\n\n• Contas a pagar registrado: R$ 132.256,02\n• Débitos operacionais no banco: R$ 132.254,86\n• Diferenças: R$ 39,50 (cesta sem registro) + R$ 1,16 (IPTU Rolândia pago a menor)\n\n*Saldo:* R$ 34.805,84 -> R$ 75.994,24\n\n*LEITURA DA SEMANA:*\n76,2% do que saiu não é operação: Sócio R$ 74.121,74 + Investimento R$ 26.283,04 + Cartão PF R$ 414,28. Só a entrada do apartamento na Yticon (R$ 70.000,00) é 52,9% do total.\n\nA conta recebeu R$ 70.351,70 em repasses das lojas na mesma semana. E só fechou positiva por causa do resgate de aplicação de R$ 103.131,06 — sem ele, teria fechado em R$ 27.136,82 negativos.\n\n*Pontos para tratar:*\n1. Enquadrar as saídas de sócio e investimento como distribuição de lucros, pró-labore ou mútuo — hoje saem sem contrapartida registrada\n2. Registrar o resgate como origem do pagamento do imóvel no fluxo de caixa\n3. IPTU Rolândia: ajustar registro de R$ 597,64 para os R$ 596,48 pagos\n4. Cesta R$ 39,50 sem cadastro (metade do que RETI e AVI pagam — vale checar o pacote)\n5. Prestadores de obra pagos por PIX a CPF (R$ 7.100,00) — confirmar nota ou recibo\n6. Cadastro é por obra e o extrato traz o fornecedor: acrescentar CNPJ ao cadastro"},{"id":"mkt-2026-09-14","ordem":20260914,"conta":"mkt","contaLabel":"MKT & VENDAS","contaDetalhe":"Ragga MKT & Vendas · conta 520213530","cor":"#E86820","razaoSocial":"Ragga MKT & Vendas","periodoLabel":"14–18/09/2026","periodoInicio":"2026-09-14","periodoFim":"2026-09-18","emitido":"2026-09-21","semana":38,"chamada":"A conciliação mais limpa das quatro contas: 11 de 11 registros, diferença zero e nenhuma tarifa não registrada. E é aqui que estava a Maria Fernanda — o PIX de R$ 478,50 que faltava para fechar a lista de horas extras do DP.","saldoAnterior":189354.82,"debitos":34662.39,"creditos":4921.32,"saldoFinal":159613.75,"saldoInformado":159613.75,"totalCP":29741.07,"debitoLiquido":29741.07,"diferenca":0.0,"registros":11,"conciliados":11,"lancamentos":12,"tarifasTotal":0,"kpis":[{"k":"Conciliado","v":"11 / 11","d":"100% dos registros localizados","tone":"hero"},{"k":"Contas a pagar","v":"29.741,07","d":"Registrado e marcado como pago"},{"k":"Débito líquido no banco","v":"29.741,07","d":"Débitos menos a devolução"},{"k":"Diferença","v":"0,00","d":"Nenhuma tarifa sem registro","tone":"hero"}],"leitura":[{"txt":"Conciliados 1:1 com o extrato","nota":"Mesmo valor, mesma data","n":"10","valor":23471.69,"tag":"Conciliado","tone":"ok"},{"txt":"Conciliado com ajuste de forma de pagamento","nota":"Cartão PF da Amanda: saída e devolução no mesmo dia","n":"1","valor":6269.38,"tag":"Conciliado","tone":"ok"},{"txt":"Lançamentos do banco sem registro","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Registros sem lançamento no banco","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Divergências de valor ou data","n":"0","valor":null,"tag":"Nenhuma","tone":"neutral"},{"txt":"Pagamentos com favorecido diferente do cadastro","nota":"Dois deles mudam a leitura do gasto, não só o nome","n":"4","valor":1783.17,"tag":"Cadastro","tone":"warn"}],"amarracao":[[{"lbl":"Saldo anterior","sub":"posição em 13/09/2026","val":189354.82},{"lbl":"(−) Débitos do período","sub":"11 lançamentos entre 14/09 e 18/09","val":34662.39,"tone":"neg"},{"lbl":"(+) Créditos do período","sub":"devolução PIX Amanda Galvão — 14/09","val":4921.32,"tone":"pos"},{"lbl":"= Saldo em 18/09/2026","val":159613.75,"tipo":"tot"},{"lbl":"Saldo informado pelo banco em 20/09/2026","sub":"extrato puxado de 12/09 a 20/09, sem movimento fora da janela","val":159613.75}],[{"lbl":"Débito líquido no banco","sub":"34.662,39 − 4.921,32","val":29741.07},{"lbl":"(−) Total registrado em contas a pagar","val":29741.07},{"lbl":"= Diferença","val":0.0,"tipo":"key"}]],"saldoDia":[["13/09",189354.82],["14/09",182020.44],["15/09",168802.58],["16/09",168734.27],["17/09",160344.27],["18/09",159613.75]],"depara":[{"dt":"14/09","f":"Amanda Galvão","cc":"Cartão PF · reembolso","ext":"PIX Amanda Galvão Antunes Pereira","extDoc":"conta 90400888","v":6269.38,"tone":"warn","tag":"Ver detalhe","nota":"Saída de 11.190,70 e devolução de 4.921,32 no mesmo dia — líquido bate","how":"O contas a pagar registra só o líquido. No extrato o mesmo favorecido aparece duas vezes em 14/09: uma saída maior e uma devolução parcial. O líquido dá exatamente o valor registrado — mesmo padrão que apareceu na RETI.","det":[{"d":"PIX enviado — Amanda Galvão Antunes Pereira","doc":"conta 90400888","v":11190.7},{"d":"PIX recebido — Amanda Galvão Antunes Pereira (devolução)","doc":"conta 90400888","v":-4921.32}]},{"dt":"14/09","f":"Duda Giachetto","cc":"Influencer","ext":"PIX Maria Eduarda Giachetto","extDoc":"PIX · 57.775.094/0001-98","v":1000.0,"tone":"warn","tag":"Nome divergente","nota":"Nome artístico no cadastro, nome civil no PIX · Biggs/Robs"},{"dt":"14/09","f":"Nova Supri","cc":"Comunicação · cartões e envelopes","ext":"Pagamento de título — Daniele Alexandre Cordeiro Gráfica e Papelaria","extDoc":"Boleto","v":65.0,"tone":"warn","tag":"Nome divergente"},{"dt":"15/09","f":"Marcela Degusta","cc":"Influencer","ext":"PIX Marcela Degusta Ltda","extDoc":"PIX · 58.038.765/0001-09","v":12000.0,"tone":"ok","tag":"OK","nota":"Mapoli — maior pagamento da semana"},{"dt":"15/09","f":"Rádio Novo Dia FM","cc":"Rádio · despesas operacionais","ext":"Pagamento efetuado — Rádio Novo Dia FM Ltda","extDoc":"Boleto","v":1000.0,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"Carolina Bispo Matsumoto","cc":"Reembolso","ext":"PIX CBM Consultoria em Comunicação e Marketing","extDoc":"PIX","v":217.86,"tone":"crit","tag":"Ver nota","nota":"Registrado como reembolso a pessoa física, pago ao CNPJ da consultoria · Benchmark no Gracco e testes de embalagens"},{"dt":"16/09","f":"Leonardo Gustavo Gravena Silva","cc":"Reembolso","ext":"PIX Leonardo Gustavo Gravena Silva","extDoc":"conta 60701190","v":68.31,"tone":"ok","tag":"OK","nota":"Gravações de MKT na Saul Elkind e no Centro"},{"dt":"17/09","f":"Setalab","cc":"Agência MKT · despesas operacionais","ext":"PIX Seta Lab","extDoc":"conta 19540550","v":6890.0,"tone":"ok","tag":"OK"},{"dt":"17/09","f":"Setalab","cc":"Tráfego · despesas operacionais","ext":"PIX Facebook Serviços Online do Brasil Ltda","extDoc":"conta 14796606","v":1500.0,"tone":"crit","tag":"Ver nota","nota":"Registrado na agência, pago direto à Meta · Robs"},{"dt":"18/09","f":"Folha de pagamento","cc":"Salário · hora extra","ext":"PIX Maria Fernanda Capelucci Pereira de Carvalho","extDoc":"conta 18236120","v":478.5,"tone":"ok","tag":"OK","nota":"Fecha a pendência aberta na RETI — banco de horas até 31/08"},{"dt":"18/09","f":"FGTS folha","cc":"Imposto","ext":"PIX CEF Matriz","extDoc":"PIX · 00.360.305/0001-04","v":252.02,"tone":"ok","tag":"OK"}],"anexos":[{"titulo":"Composição do desembolso por centro de custo","sub":"Onde os R$ 29.741,07 da semana foram aplicados. Mídia (influencer, agência, tráfego e rádio) responde por 75,3% do total.","cols":["Centro de custo","Registros","Valor","% da semana","Natureza"],"aligns":["","r","r","r",""],"rows":[["Influencer","2","13.000,00","43,7%","ok:Mídia"],["Agência MKT","1","6.890,00","23,2%","ok:Mídia"],["Cartão PF","1","6.269,38","21,1%","warn:Reembolso"],["Tráfego","1","1.500,00","5,0%","ok:Mídia"],["Rádio","1","1.000,00","3,4%","ok:Mídia"],["Salário","1","478,50","1,6%","ok:Pessoal"],["Reembolso","2","286,17","1,0%","ok:Reembolso"],["Imposto","1","252,02","0,8%","ok:Imposto"],["Comunicação","1","65,00","0,2%","ok:Operacional"]],"foot":["Total","11","29.741,07","100%",""]},{"titulo":"Lista de horas extras do DP — amarração final","sub":"A lista do DP (fechamento do banco de horas até 31/08/2026) saiu por duas contas. Com o PIX de 18/09 desta conta, ela fecha 100%.","cols":["Origem","Colaboradores","Valor","Situação"],"aligns":["","r","r",""],"rows":[["RETI · Ragga Gestão","10","8.046,83","ok:Conciliado"],["MKT & Vendas · Maria Fernanda Capelucci","1","478,50","ok:Conciliado"]],"foot":["Total da lista do DP","11","8.525,33",""]}],"divergencias":[{"tier":"ok","titulo":"Pendência da RETI resolvida: Maria Fernanda","tag":"R$ 478,50","paras":["A lista de horas extras do DP trazia Maria Fernanda Capelucci como empresa MEL, e o valor não aparecia no extrato da RETI. Ele saiu daqui: PIX de R$ 478,50 em 18/09, direto para ela. Com isso a lista do DP fecha inteira — R$ 8.046,83 pela RETI mais R$ 478,50 por esta conta dão os R$ 8.525,33 do fechamento."],"acao":"Nenhuma. A pendência pode ser baixada no fechamento da RETI."},{"tier":"crit","titulo":"Verba de mídia paga à Meta registrada na agência","tag":"R$ 1.500,00","paras":["O registro de tráfego está no fornecedor Setalab, mas o PIX foi direto para o Facebook Serviços Online do Brasil. Pagar mídia direto à plataforma é a prática correta — o problema é o cadastro: somando este lançamento, a Setalab aparece com R$ 8.390,00 na semana quando recebeu R$ 6.890,00.","Enquanto o registro ficar assim, não dá para separar honorário de agência de investimento em mídia, que são coisas diferentes para medir retorno."],"acao":"Cadastrar Meta/Facebook como fornecedor próprio e manter o centro de custo Tráfego. O mesmo vale para Google Ads se houver."},{"tier":"crit","titulo":"Reembolso de pessoa física pago a CNPJ","tag":"R$ 217,86","paras":["O registro está como reembolso para Carolina Bispo Matsumoto, mas o PIX foi para CBM Consultoria em Comunicação e Marketing. São as iniciais dela, então provavelmente é a PJ da própria pessoa — mas reembolso de despesa é ressarcimento, e pagamento a PJ é prestação de serviço. São naturezas fiscais diferentes."],"acao":"Definir qual é o caso. Se for reembolso, pagar à pessoa física com o comprovante da despesa anexado; se for serviço, registrar como serviço com nota."},{"tier":"crit","titulo":"Cartão PF da Amanda: o padrão se repete em duas contas","tag":"R$ 23.429,07 brutos","paras":["Mesma mecânica da RETI: aqui saíram R$ 11.190,70 e voltaram R$ 4.921,32 no mesmo dia, líquido R$ 6.269,38 igual ao registrado. Na RETI foram R$ 12.238,37 com devolução de R$ 1.497,59. Somando as duas contas, saíram R$ 23.429,07 e voltaram R$ 6.418,91, para um líquido de R$ 17.010,16.","Nas duas contas o contas a pagar registra só o líquido, então o bruto e a devolução não existem em lugar nenhum além do extrato. Como acontece nas duas na mesma semana, não é ocorrência isolada — é o jeito como o reembolso do cartão vem sendo operado."],"acao":"Registrar as duas pontas: o pagamento bruto e o estorno. Ou, melhor, acertar o valor antes de enviar o PIX, para não precisar de devolução."},{"tier":"warn","titulo":"Concentração em influenciadores","tag":"43,7% da semana","paras":["Marcela Degusta (R$ 12.000,00, Mapoli) e Duda Giachetto (R$ 1.000,00, Biggs/Robs) somam R$ 13.000,00 — quase metade do desembolso. Só a Marcela é 40,3% da semana inteira.","Somando agência, tráfego e rádio, a mídia chega a R$ 22.390,00: 75,3% de tudo que saiu."],"acao":"Vale amarrar esses valores ao retorno por unidade — a Marcela está vinculada à Mapoli e a Duda a Biggs/Robs, então dá para medir."},{"tier":"warn","titulo":"Nome divergente em cadastro de fornecedor","tag":"2 casos","paras":["Nova Supri → Daniele Alexandre Cordeiro Gráfica e Papelaria (boleto de cartões e envelopes) e Duda Giachetto → Maria Eduarda Giachetto, CNPJ 57.775.094/0001-98 (nome artístico contra nome civil). Valores e datas corretos."],"acao":"Gravar razão social e CNPJ no cadastro."},{"tier":"ok","titulo":"Única conta sem tarifa bancária","tag":"R$ 0,00","paras":["Nenhum lançamento de tarifa no período. As três contas Sicredi pagaram cesta de relacionamento na mesma semana: RETI R$ 79,00, AVI R$ 79,00 e MARLAY R$ 39,50, mais R$ 79,08 de carteira de cobrança na AVI."],"acao":"Nenhuma aqui. Serve de comparação ao renegociar o pacote das contas Sicredi."}],"pendencias":4,"pendenciasAbertas":["Cadastrar Meta/Facebook como fornecedor próprio — R$ 1.500,00 registrados na Setalab","Definir natureza do pagamento à CBM Consultoria: reembolso a PF ou serviço a PJ (R$ 217,86)","Registrar as duas pontas do cartão PF da Amanda (bruto e estorno) — padrão repetido em RETI e MKT","Gravar razão social e CNPJ no cadastro: Nova Supri e Duda Giachetto"],"wpp":"*CONCILIAÇÃO SEMANAL — RAGGA MKT & VENDAS*\nPeríodo: 14/09 a 18/09/2026 · Conta 520213530\n\n*Resultado:* 11 de 11 registros conciliados. *Diferença zero* e nenhuma tarifa sem registro — a conciliação mais limpa das quatro contas.\n\n• Contas a pagar registrado: R$ 29.741,07\n• Débito líquido no banco: R$ 29.741,07\n\n*Saldo:* R$ 189.354,82 -> R$ 159.613,75\n\n*ACHADO: Maria Fernanda encontrada*\nO PIX de R$ 478,50 que faltava para fechar a lista de horas extras do DP saiu desta conta em 18/09. A lista fecha 100%: R$ 8.046,83 pela RETI + R$ 478,50 pela MKT = R$ 8.525,33. Pode baixar a pendência da RETI.\n\n*Onde foi o dinheiro:* mídia é 75,3% da semana. Influencer R$ 13.000,00 (Marcela Degusta 12.000 / Mapoli e Duda Giachetto 1.000 / Biggs-Robs), agência R$ 6.890,00, tráfego R$ 1.500,00, rádio R$ 1.000,00.\n\n*Pontos para tratar:*\n1. Os R$ 1.500,00 de tráfego estão registrados na Setalab mas foram pagos direto à Meta — cadastrar a Meta como fornecedor, senão não dá para separar honorário de agência de investimento em mídia\n2. Reembolso da Carolina (R$ 217,86) registrado como PF mas pago ao CNPJ CBM Consultoria — definir se é reembolso ou serviço\n3. Cartão PF da Amanda: saiu R$ 11.190,70 e voltou R$ 4.921,32 no mesmo dia. Mesmo padrão da RETI na mesma semana — nas duas contas só o líquido é registrado\n4. Nova Supri e Duda Giachetto: gravar razão social e CNPJ no cadastro"},{"id":"reti-2026-09-14","ordem":20260914,"conta":"reti","contaLabel":"RETI","contaDetalhe":"Ragga Gestão · Sicredi 65737-0","cor":"#1E40AF","razaoSocial":"RETI Consultoria e Gestão de Restaurantes Ltda","periodoLabel":"14–18/09/2026","periodoInicio":"2026-09-14","periodoFim":"2026-09-18","emitido":"2026-09-21","semana":38,"chamada":"Os 16 registros foram localizados no extrato e os 10 nomes da folha conferem com a lista do DP. A única diferença de valor é uma tarifa bancária não cadastrada.","saldoAnterior":101915.79,"debitos":46096.36,"creditos":1497.59,"saldoFinal":57317.02,"saldoInformado":57316.02,"totalCP":44519.77,"debitoLiquido":44598.77,"diferenca":79.0,"registros":16,"conciliados":16,"lancamentos":28,"kpis":[{"k":"Conciliado","v":"16 / 16","d":"100% dos registros localizados","tone":"hero"},{"k":"Contas a pagar","v":"44.519,77","d":"Registrado e marcado como pago"},{"k":"Débito líquido no banco","v":"44.598,77","d":"Débitos menos o estorno recebido"},{"k":"Diferença","v":"79,00","d":"Cesta de relacionamento (tarifa)","tone":"warn"}],"leitura":[{"txt":"Conciliados 1:1 com o extrato","nota":"Mesmo valor, mesma data, um débito para cada registro","n":"13","valor":25657.26,"tag":"Conciliado","tone":"ok"},{"txt":"Conciliados com ajuste de forma de pagamento","nota":"Folha em 10 PIX · reembolso Larissa em 2 PIX · reembolso Amanda com estorno","n":"3","valor":18862.51,"tag":"Conciliado","tone":"ok"},{"txt":"Lançamento do banco sem registro no contas a pagar","nota":"Cesta de relacionamento — 15/09","n":"1","valor":79.0,"tag":"A cadastrar","tone":"crit"},{"txt":"Registros sem lançamento no banco","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Divergências de valor pago × registrado","n":"0","valor":null,"tag":"Nenhuma","tone":"neutral"}],"amarracao":[[{"lbl":"Saldo anterior","sub":"posição em 13/09/2026","val":101915.79},{"lbl":"(−) Débitos do período","sub":"27 lançamentos entre 14/09 e 18/09","val":46096.36,"tone":"neg"},{"lbl":"(+) Créditos do período","sub":"devolução PIX Amanda Galvão — 14/09","val":1497.59,"tone":"pos"},{"lbl":"= Saldo em 18/09/2026","val":57317.02,"tipo":"tot"},{"lbl":"Saldo informado pelo banco em 21/09/2026","val":57316.02},{"lbl":"Diferença a identificar","sub":"movimentação entre 19/09 e 21/09, fora da janela","val":1.0,"tone":"warnv"}],[{"lbl":"Débito líquido no banco","sub":"46.096,36 − 1.497,59","val":44598.77},{"lbl":"(−) Total registrado em contas a pagar","val":44519.77},{"lbl":"= Diferença explicada pela tarifa bancária","val":79.0,"tipo":"key"}]],"depara":[{"dt":"14/09","f":"Amanda Galvão","cc":"Cartão PF · reembolso","ext":"PIX Amanda Galvão Antunes","extDoc":"130.954.619-33","v":10740.78,"tone":"warn","tag":"Ver detalhe","nota":"Débito de 12.238,37 e devolução de 1.497,59 no mesmo dia — líquido bate","how":"O contas a pagar registra só o líquido. No extrato o mesmo CPF aparece duas vezes em 14/09: uma saída maior e uma devolução parcial. Considerei as duas pontas.","det":[{"d":"PIX Amanda Galvão Antunes (saída)","doc":"130.954.619-33","v":12238.37},{"d":"Recebimento PIX Amanda Galvão Antunes (devolução)","doc":"130.954.619-33","v":-1497.59}]},{"dt":"14/09","f":"Marcelo de Oliveira Russo","cc":"Reembolso","ext":"PIX Marcelo de Oliveira Russo","extDoc":"026.945.689-98","v":700.0,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"Denise","cc":"Honorários · parcela 2/5","ext":"PIX Denise de Souza Escobar","extDoc":"045.111.479-57","v":2593.6,"tone":"ok","tag":"OK"},{"dt":"14/09","f":"Cleanpar Apuc","cc":"CMV · compra de mercadoria","ext":"Boleto Cleanpar Apuc","extDoc":"48.952.813/0001-08","v":222.67,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"ESA","cc":"Energia · usina","ext":"PIX ESA Capital e Energia","extDoc":"41.813.358/0001-10","v":403.2,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"Caroline Alilat de Souza","cc":"Salário","ext":"PIX Caroline Alilat de Souza","extDoc":"075.155.389-10","v":400.0,"tone":"ok","tag":"OK"},{"dt":"15/09","f":"Muth","cc":"Seguro","ext":"Boleto Londrimuth Assessoria","extDoc":"28.608.574/0001-66","v":91.14,"tone":"warn","tag":"Nome divergente","nota":"Razão social da corretora"},{"dt":"15/09","f":"Teknisa Servicce S.A.","cc":"Sistema · implantação 1/6","ext":"Boleto Teknisa Servicce","extDoc":"14.288.794/0001-45","v":13914.77,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"Larissa Cristine Maia","cc":"Reembolso · chip","ext":"PIX Larissa Cristine Maia","extDoc":"025.447.233-86","v":39.0,"tone":"ok","tag":"OK"},{"dt":"16/09","f":"ACF ID Indústria e Soluções","cc":"Despesas gerais · crachás","ext":"PIX Paraná Cards","extDoc":"60.354.309/0001-01","v":9.9,"tone":"warn","tag":"Ver detalhe","nota":"CNPJ confere com o cadastro; nome fantasia diferente","how":"O nome no extrato não bate com o cadastro. Casei pelo CNPJ informado na descrição do pagamento, que é o mesmo do fornecedor registrado.","det":[{"d":"PIX Paraná Cards","doc":"60.354.309/0001-01","v":9.9}]},{"dt":"16/09","f":"Larissa Cristine Maia","cc":"Reembolso · carregadores MKT","ext":"Dois PIX Larissa Cristine Maia","extDoc":"025.447.233-86","v":74.9,"tone":"warn","tag":"Ver detalhe","nota":"Pagamento fracionado, soma bate","how":"Nenhum débito isolado de 74,90. No mesmo dia e para o mesmo CPF há dois PIX que somados dão o valor exato do registro.","det":[{"d":"PIX Larissa Cristine Maia","doc":"025.447.233-86","v":50.0},{"d":"PIX Larissa Cristine Maia","doc":"025.447.233-86","v":24.9}]},{"dt":"17/09","f":"Muth","cc":"Seguro","ext":"Boleto Capemisa Seguradora","extDoc":"08.602.745/0001-32","v":58.56,"tone":"warn","tag":"Nome divergente","nota":"Boleto emitido pela seguradora, não pela corretora"},{"dt":"18/09","f":"Folha de pagamento","cc":"Salário · hora extra","ext":"10 PIX individuais","extDoc":"lote de 18/09","v":8046.83,"tone":"warn","tag":"Ver detalhe","nota":"Soma exata dos 10 pagamentos · confirmada pela lista do DP","how":"Nenhum débito de 8.046,83 no extrato. Isolei os 13 débitos de 18/09 (R$ 15.271,25), tirei os 3 que já tinham registro próprio (Caroline 1.247,60, Rejaine 2.037,20 e FGTS 3.939,62 = R$ 7.224,42) e o resíduo de 10 PIX somou exatamente o valor da folha. A lista de horas extras do DP confirmou os 10 nomes, um a um.","det":[{"d":"PIX Ivan Pereira Neves Jr.","doc":"086.825.539-45","v":71.4},{"d":"PIX Aline Fernanda de Souza","doc":"412.038.748-80","v":79.78},{"d":"PIX Vitória Ferreira Tamaki","doc":"100.987.289-38","v":200.6},{"d":"PIX Giovanna Oliveira Modesto","doc":"118.190.539-70","v":510.62},{"d":"PIX Giovana Ruis de Moura","doc":"102.780.379-25","v":513.17},{"d":"PIX Larissa Cristine Maia","doc":"025.447.233-86","v":576.82},{"d":"PIX Rejaine Queli Sois David","doc":"016.856.631-17","v":587.29},{"d":"PIX Eduma Comércio — Maria Eduarda Alves","doc":"64.315.037/0001-91","v":965.94},{"d":"PIX Monalisa Cristina de Freitas","doc":"081.967.599-75","v":1104.84},{"d":"PIX Rafaela Torres","doc":"059.238.099-82","v":3436.37}]},{"dt":"18/09","f":"Caroline Alilat de Souza","cc":"Salário · adiantamento","ext":"PIX Caroline Alilat de Souza","extDoc":"075.155.389-10","v":1247.6,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"Rejaine Queli","cc":"Salário · adiantamento","ext":"PIX Rejaine Queli Sois David","extDoc":"016.856.631-17","v":2037.2,"tone":"ok","tag":"OK"},{"dt":"18/09","f":"FGTS folha","cc":"Imposto","ext":"PIX CEF Matriz","extDoc":"00.360.305/0001-04","v":3939.62,"tone":"ok","tag":"OK","nota":"Recolhimento via Caixa Econômica"}],"semRegistro":[{"dt":"15/09","d":"Cesta de relacionamento","v":79.0,"nat":"Pacote de serviços"}],"anexos":[{"titulo":"Confronto com a lista do DP — horas extras","sub":"Fechamento do banco de horas até 31/08/2026, 11 colaboradores, R$ 8.525,33. Os 10 nomes RAGGA conferem um a um. O parcelamento previsto foi substituído por quitação à vista (decisão confirmada) e a parcela da empresa MEL saiu por outra conta.","cols":["Colaborador","Empresa","Horas","Valor a pagar","Parcelamento previsto","Pago em 18/09","Confronto"],"aligns":["","","r","r","","r",""],"rows":[["Maria Fernanda Capelucci P. de Carvalho","MEL","20:03","478,50","2 × 239,25","—","neutral:Outra conta"],["Rejaine Queli Sois David","RAGGA","13:03","587,29","2 × 293,65","587,29","ok:Quitado à vista"],["Vitória Ferreira Tamaki Marcelino","RAGGA","06:36","200,60","Parcela única","200,60","ok:Confere"],["Giovanna Oliveira Modesto","RAGGA","16:48","510,62","2 × 255,31","510,62","ok:Quitado à vista"],["Larissa Cristine Maia Rodrigues","RAGGA","14:06","576,82","2 × 288,41","576,82","ok:Quitado à vista"],["Giovana Ruis de Moura","RAGGA","15:41","513,17","2 × 256,59","513,17","ok:Quitado à vista"],["Rafaela Torres","RAGGA","84:00","3.436,37","3 × 1.145,46","3.436,37","ok:Quitado à vista"],["Monalisa Cristina de Freitas Rodrigues","RAGGA","36:21","1.104,84","2 × 552,42","1.104,84","ok:Quitado à vista"],["Aline Fernanda de Souza","RAGGA","03:15","79,78","Parcela única","79,78","ok:Confere"],["Maria Eduarda Alves","RAGGA","31:47","965,94","2 × 482,97","965,94","crit:Pediu p/ não receber"],["Ivan Pereira Neves Junior","RAGGA","03:24","71,40","Parcela única","71,40","ok:Confere"]],"foot":["Total da lista do DP","","","8.525,33","1ª rodada prevista: 3.626,59","8.046,83",""]}],"divergencias":[{"tier":"crit","titulo":"Tarifa bancária fora do contas a pagar","tag":"R$ 79,00","paras":["A cesta de relacionamento do Sicredi foi debitada em 15/09 e não tem registro correspondente. É o único lançamento do extrato sem contrapartida — e responde por 100% da diferença da semana."],"acao":"Cadastrar como despesa recorrente mensal (Despesas Gerais / Tarifas) para entrar automaticamente nas próximas conciliações."},{"tier":"crit","titulo":"Maria Eduarda pediu para não receber — e recebeu","tag":"R$ 965,94","paras":["A observação do DP na própria planilha diz que ela pediu para não receber, porque vai precisar dessas horas em janeiro para uma viagem. Ainda assim, o valor integral saiu em 18/09, pago ao CNPJ dela (Eduma Comércio)."],"acao":"Alinhar com o DP. Se o pedido valia, o banco de horas precisa ser reaberto ou o valor devolvido — e a folha paga de fato seria R$ 7.080,89."},{"tier":"warn","titulo":"Reembolso Amanda Galvão pago a maior e devolvido","tag":"Bruto ≠ líquido","paras":["O banco registra saída de R$ 12.238,37 e entrada de R$ 1.497,59 no mesmo dia, para o mesmo CPF. O líquido de R$ 10.740,78 bate com o valor registrado, mas o contas a pagar só mostra o líquido."],"acao":"Confirmar se foi erro de digitação no PIX ou parcela estornada e registrar o estorno como entrada."},{"tier":"ok","titulo":"Pagamento à vista da folha — decisão confirmada","tag":"Validado","paras":["A planilha do DP previa parcelamento para 7 dos 10 colaboradores RAGGA (1ª rodada de R$ 3.626,59), mas a decisão foi quitar o banco de horas integralmente. Os R$ 8.046,83 estão corretos; os R$ 4.420,24 de diferença contra a planilha são antecipação intencional."],"acao":"Conferir se as parcelas de outubro e novembro chegaram a ser lançadas no contas a pagar. Se estiverem, baixar como quitadas."},{"tier":"warn","titulo":"Divergência de nome entre cadastro e extrato","tag":"3 casos","paras":["Muth → Londrimuth (razão social da corretora), Muth → Capemisa Seguradora (boleto emitido direto pela seguradora) e ACF ID → Paraná Cards (CNPJ confere). Todos os valores batem; só o nome dificulta a busca."],"acao":"Incluir razão social e CNPJ no cadastro do fornecedor."},{"tier":"warn","titulo":"Folha registrada como valor único","tag":"Rastreabilidade","paras":["Os R$ 8.046,83 entram como uma linha só, enquanto o banco mostra dez PIX. A conciliação só fechou porque a soma do resíduo do dia coincidiu, e só ficou provada quando a lista do DP chegou."],"acao":"Registrar a folha por lote de pagamento, com a lista de horas extras anexada ao registro."},{"tier":"ok","titulo":"Maria Fernanda — resolvido na conta da MKT & Vendas","tag":"Resolvido","paras":["Maria Fernanda Capelucci está na lista do DP como empresa MEL e não aparecia no extrato da RETI. O PIX de R$ 478,50 saiu da conta da Ragga MKT & Vendas em 18/09, direto para ela. Com isso a lista do DP fecha inteira: R$ 8.046,83 pela RETI mais R$ 478,50 pela MKT dão os R$ 8.525,33 do fechamento."],"acao":"Nenhuma. Conferido contra o extrato da conta 520213530 — ver a aba MKT & Vendas."},{"tier":"neutral","titulo":"Diferença de R$ 1,00 no saldo informado","tag":"Fora da janela","paras":["O extrato acumula R$ 57.317,02 em 18/09 e o informado em 21/09 é R$ 57.316,02."],"acao":"Puxar o extrato de 19/09 a 21/09 e incluir na conciliação da próxima semana."}],"pendencias":5,"pendenciasAbertas":["Maria Eduarda Alves pediu para não receber e recebeu R$ 965,94","Conferir se as parcelas de out/nov foram lançadas no contas a pagar","Cesta de relacionamento R$ 79,00 sem registro","Reembolso Amanda: estorno de R$ 1.497,59 não registrado","Nomes divergentes: Muth/Londrimuth, Muth/Capemisa, ACF ID/Paraná Cards","Folha registrada como valor único em vez de lote","Saldo em 21/09 R$ 1,00 abaixo — conciliar 19 a 21/09"],"wpp":"*CONCILIAÇÃO SEMANAL — RETI (Ragga Gestão)*\nPeríodo: 14/09 a 18/09/2026 · Conta Sicredi 65737-0\n\n*Resultado:* 16 de 16 registros conciliados. Nenhuma divergência de valor.\n\n• Contas a pagar registrado: R$ 44.519,77\n• Débito líquido no banco: R$ 44.598,77\n• Diferença: R$ 79,00 (cesta de relacionamento, sem registro)\n\n*Saldo:* R$ 101.915,79 -> R$ 57.317,02 em 18/09\n\n*FOLHA / HORAS EXTRAS*\nO registro único de R$ 8.046,83 saiu em 10 PIX individuais. Confrontei com a lista do DP: os 10 nomes RAGGA conferem um a um. A lista tem R$ 8.525,33, sendo R$ 478,50 da Maria Fernanda (empresa MEL) que saiu pela conta da MKT & Vendas (conferido). Pagamento à vista confirmado.\n\n*EM ABERTO:*\n1. Maria Eduarda Alves pediu para não receber, mas os R$ 965,94 saíram em 18/09 — definir se estorna ou reabre o banco de horas\n2. Conferir se as parcelas de out/nov foram lançadas no contas a pagar\n3. Cesta de relacionamento R$ 79,00 — cadastrar como recorrente\n4. Registrar o estorno de R$ 1.497,59 do reembolso da Amanda\n5. Nomes divergentes: Muth/Londrimuth, Muth/Capemisa, ACF ID/Paraná Cards\n6. Saldo em 21/09 R$ 1,00 abaixo — puxar extrato de 19 a 21/09"},{"id":"social-2026-09-14","ordem":20260914,"conta":"social","contaLabel":"RAGGA SOCIAL","contaDetalhe":"Ragga Social · conta digital","cor":"#8A2040","razaoSocial":"Ragga Social","periodoLabel":"14–18/09/2026","periodoInicio":"2026-09-14","periodoFim":"2026-09-18","emitido":"2026-09-21","semana":38,"chamada":"Uma única movimentação na semana, conciliada 1:1 com o registro. Diferença zero. Dois pontos de processo: o extrato enviado não traz saldo, e a descrição do registro guarda um dado pessoal sensível que não deveria estar numa planilha financeira.","saldoAnterior":null,"debitos":1550.02,"creditos":0,"saldoFinal":null,"saldoInformado":null,"totalCP":1550.02,"debitoLiquido":1550.02,"diferenca":0.0,"registros":1,"conciliados":1,"lancamentos":1,"tarifasTotal":0,"kpis":[{"k":"Conciliado","v":"1 / 1","d":"Registro localizado no extrato","tone":"hero"},{"k":"Contas a pagar","v":"1.550,02","d":"Registrado e marcado como pago"},{"k":"Débito no banco","v":"1.550,02","d":"Único lançamento do período"},{"k":"Diferença","v":"0,00","d":"Sem tarifa no período","tone":"hero"}],"leitura":[{"txt":"Conciliado 1:1 com o extrato","nota":"Mesmo valor, mesma data, mesmo favorecido","n":"1","valor":1550.02,"tag":"Conciliado","tone":"ok"},{"txt":"Lançamentos do banco sem registro","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Registros sem lançamento no banco","n":"0","valor":null,"tag":"Nenhum","tone":"neutral"},{"txt":"Divergências de valor ou data","n":"0","valor":null,"tag":"Nenhuma","tone":"neutral"}],"amarracao":[[{"lbl":"Débitos do período","sub":"1 lançamento — 17/09","val":1550.02,"tone":"neg"},{"lbl":"Créditos do período","sub":"nenhum","val":0},{"lbl":"(−) Total registrado em contas a pagar","val":1550.02},{"lbl":"= Diferença","val":0.0,"tipo":"key"}],[{"lbl":"Saldo anterior","sub":"o extrato enviado não traz coluna de saldo","val":null},{"lbl":"Saldo em 18/09/2026","sub":"não é possível amarrar a posição com este arquivo","val":null}]],"depara":[{"dt":"17/09","f":"Silas Dias Barbosa","cc":"Ajuda de custo · despesa médica","ext":"PIX Silas Barbosa Dias","extDoc":"PIX · CPF •••.749.338-•• · Sicredi ag. 718 c/ 80560-4","v":1550.02,"tone":"warn","tag":"Ver nota","nota":"Ordem do sobrenome invertida entre cadastro e banco · natureza a confirmar"}],"divergencias":[{"tier":"crit","titulo":"Dado pessoal sensível na planilha financeira","tag":"LGPD","paras":["A descrição deste registro no contas a pagar detalha a condição de saúde e o procedimento médico de um colaborador identificado pelo nome. Sob a LGPD isso é dado pessoal sensível (art. 5º, II), com regime de tratamento mais restrito que o de dado comum — e uma planilha de contas a pagar costuma circular entre financeiro, contabilidade e diretoria, um alcance bem maior do que esse dado deveria ter.","Por isso não reproduzi o detalhe aqui: este painel registra a natureza da despesa (ajuda de custo médica) e o valor, que é o que a conciliação precisa."],"acao":"Manter na planilha financeira apenas a natureza e o valor. O detalhe do caso, se precisar ser guardado, fica em prontuário ou pasta de RH com acesso restrito, referenciado por um número de protocolo. Vale rodar a mesma revisão nas outras contas — este tipo de detalhe costuma aparecer em campo livre de reembolso."},{"tier":"warn","titulo":"Natureza da ajuda de custo a confirmar","tag":"R$ 1.550,02","paras":["O pagamento foi feito direto ao CPF do colaborador, com a rubrica ajuda de custo. Dependendo de como está formalizado, um valor assim pode ser lido como utilidade de natureza salarial, com reflexo em encargos e verbas rescisórias, ou como benefício ou liberalidade sem esse efeito.","Não sou contador nem advogado, então trato isso como ponto a validar, não como conclusão."],"acao":"Confirmar com a contabilidade e o DP como a rubrica está enquadrada e se há política escrita de ajuda de custo. Se houver, referenciar a política no registro."},{"tier":"warn","titulo":"Extrato sem coluna de saldo","tag":"Processo","paras":["O arquivo enviado tem apenas data, valor, identificador e descrição. Dá para conferir o lançamento, mas não dá para amarrar saldo anterior e saldo final — que é a checagem que garante que nenhum lançamento ficou de fora do período.","Nas outras quatro contas essa amarração é o que provou que o extrato estava completo."],"acao":"Exportar o extrato desta conta com saldo, no mesmo formato das demais, para o fechamento ficar no mesmo padrão."},{"tier":"neutral","titulo":"Ordem do sobrenome invertida","tag":"Cadastro","paras":["Cadastro traz Silas Dias Barbosa; o banco, Silas Barbosa Dias. Mesmo CPF, mesmo valor, mesma data — é só a ordem do sobrenome."],"acao":"Ajustar o cadastro para o nome como consta no documento, e gravar o CPF."}],"pendencias":4,"pendenciasAbertas":["Remover o detalhe de saúde da descrição no contas a pagar e revisar campos livres das outras contas (LGPD)","Confirmar com contabilidade e DP o enquadramento da rubrica ajuda de custo","Exportar o extrato desta conta com coluna de saldo","Ajustar nome e gravar CPF no cadastro do colaborador"],"wpp":"*CONCILIAÇÃO SEMANAL — RAGGA SOCIAL*\nPeríodo: 14/09 a 18/09/2026\n\n*Resultado:* 1 de 1 registro conciliado. Diferença zero.\n\n• Contas a pagar registrado: R$ 1.550,02\n• Débito no banco: R$ 1.550,02\n• Ajuda de custo paga em 17/09 via PIX ao CPF do colaborador\n\n*Pontos para tratar:*\n1. *LGPD* — a descrição do registro no contas a pagar detalha condição de saúde de um colaborador identificado. Isso é dado pessoal sensível e não deveria estar numa planilha que circula entre financeiro, contabilidade e diretoria. Sugiro deixar só a natureza e o valor, e guardar o detalhe em pasta de RH com acesso restrito. Vale revisar os campos livres das outras contas também.\n2. Confirmar com contabilidade e DP o enquadramento da rubrica ajuda de custo (se tem ou não reflexo trabalhista)\n3. O extrato desta conta veio sem coluna de saldo — sem ela não dá para amarrar a posição e garantir que nada ficou de fora do período\n4. Cadastro está como Silas Dias Barbosa e o banco traz Silas Barbosa Dias — ajustar e gravar o CPF"}];
+</script>
+<script>
+(function(){
+  "use strict";
+  var brl=function(n){return (n==null)?'—':n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});};
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined&&x!==null)e.textContent=x;return e;}
+  function card(){return el('section','card');}
+  function h2(p,t,s){p.appendChild(el('h2',null,t));if(s)p.appendChild(el('p','sub',s));}
+
+  var DOCS=[], conta='holding', periodo=null;
+  var tabsEl=document.getElementById('tabs'), perEl=document.getElementById('periodos'),
+      viewEl=document.getElementById('view'), statusEl=document.getElementById('dbStatus'),
+      dotEl=document.getElementById('markDot'), subEl=document.getElementById('markSub');
+
+  function periodos(){
+    var seen={},out=[];
+    DOCS.forEach(function(d){ if(!seen[d.periodoLabel]){seen[d.periodoLabel]=1;out.push({lbl:d.periodoLabel,ord:d.ordem||0});} });
+    return out.sort(function(a,b){return b.ord-a.ord;});
+  }
+  function contas(){
+    var seen={},out=[];
+    DOCS.forEach(function(d){ if(!seen[d.conta]){seen[d.conta]=1;out.push({k:d.conta,lbl:d.contaLabel,cor:d.cor||'#2D204E'});} });
+    return out;
+  }
+  function docAtual(){
+    for(var i=0;i<DOCS.length;i++) if(DOCS[i].conta===conta && DOCS[i].periodoLabel===periodo) return DOCS[i];
+    return null;
+  }
+
+  function kpiBlock(p,kpis){
+    if(!kpis||!kpis.length) return;
+    var g=el('div','kpis');
+    kpis.forEach(function(k){
+      var b=el('div','kpi'+(k.tone?' '+k.tone:''));
+      b.appendChild(el('div','k',k.k));
+      b.appendChild(el('div','v',k.v));
+      if(k.d) b.appendChild(el('div','d',k.d));
+      g.appendChild(b);
+    });
+    p.appendChild(g);
+  }
+  function amarrBlock(p,blocos){
+    (blocos||[]).forEach(function(bloco){
+      var box=el('div','amarr');
+      bloco.forEach(function(r){
+        var row=el('div','row'+(r.tipo?' '+r.tipo:''));
+        var l=el('span','lbl',r.lbl);
+        if(r.sub) l.appendChild(el('small',null,r.sub));
+        if(r.tone==='warnv') l.style.color='var(--warn)';
+        row.appendChild(l);
+        var v=el('span','val '+(r.tone==='neg'?'neg':(r.tone==='pos'?'pos':'')),'R$ '+brl(r.val));
+        if(r.tone==='warnv') v.style.color='var(--warn)';
+        row.appendChild(v);
+        box.appendChild(row);
+      });
+      p.appendChild(box);
+    });
+  }
+  function barsBlock(p,items,cor,cap){
+    var max=items.reduce(function(m,x){return Math.max(m,Math.abs(x[1]));},0)||1;
+    var bars=el('div','bars');
+    items.forEach(function(x){
+      var b=el('div','bar');
+      b.appendChild(el('div','bl',x[0]));
+      var tk=el('div','track'),fl=el('div','fill');
+      fl.style.width=Math.max(0.5,(Math.abs(x[1])/max)*100)+'%';
+      fl.style.background=x[2]||cor;
+      tk.appendChild(fl);b.appendChild(tk);
+      b.appendChild(el('div','bv',brl(x[1])));
+      bars.appendChild(b);
+    });
+    if(cap){var c=el('p','sub',cap);c.style.margin='0 0 12px';p.appendChild(c);}
+    p.appendChild(bars);
+  }
+  function divsBlock(p,list){
+    var box=el('div','divs');
+    list.forEach(function(d){
+      var w=el('div','dv '+(d.tier==='neutral'?'':d.tier));
+      w.appendChild(el('div','stripe'));
+      var b=el('div');
+      var t=el('h3',null,d.titulo);
+      if(d.tag) t.appendChild(el('span','tag t-'+(d.tier==='ok'?'ok':(d.tier==='crit'?'crit':(d.tier==='warn'?'warn':'neutral'))),d.tag));
+      b.appendChild(t);
+      (d.paras||[]).forEach(function(x){ b.appendChild(el('p',null,x)); });
+      if(d.acao){ var a=el('p','acao'); a.appendChild(el('b',null,'Ação: ')); a.appendChild(document.createTextNode(d.acao)); b.appendChild(a); }
+      w.appendChild(b); box.appendChild(w);
+    });
+    p.appendChild(box);
+  }
+
+
+  /* ---------- pendências derivadas + modal ---------- */
+  function pendsDe(d){
+    return (d.divergencias||[]).filter(function(x){return x.tier==='crit'||x.tier==='warn';});
+  }
+  var ovlEl=null, lastFocus=null;
+  function fecharModal(){
+    if(!ovlEl) return;
+    ovlEl.remove(); ovlEl=null;
+    document.body.style.overflow='';
+    document.removeEventListener('keydown',escHandler);
+    if(lastFocus&&lastFocus.focus) lastFocus.focus();
+  }
+  function escHandler(e){ if(e.key==='Escape') fecharModal(); }
+  function abrirModal(d,p){
+    fecharModal();
+    lastFocus=document.activeElement;
+    var ovl=el('div','ovl');
+    ovl.addEventListener('click',function(e){ if(e.target===ovl) fecharModal(); });
+    var m=el('div','modal');
+    m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.tabIndex=-1;
+    var top=el('div','mtop');
+    var left=el('div');
+    var ct=el('div','mconta');
+    var cd=el('span','cd'); cd.style.background=d.cor||'#2D204E';
+    ct.appendChild(cd);
+    ct.appendChild(document.createTextNode(d.contaLabel+' · '+d.periodoLabel));
+    left.appendChild(ct);
+    var t=el('h3',null,p.titulo);
+    if(p.tag) t.appendChild(el('span','tag t-'+(p.tier==='crit'?'crit':'warn'),p.tag));
+    left.appendChild(t);
+    top.appendChild(left);
+    var x=el('button','xbtn','×'); x.type='button'; x.setAttribute('aria-label','Fechar');
+    x.addEventListener('click',fecharModal);
+    top.appendChild(x);
+    m.appendChild(top);
+    (p.paras||[]).forEach(function(tx){ m.appendChild(el('p',null,tx)); });
+    if(p.acao){
+      var box=el('div','acaobox');
+      box.appendChild(el('div','al','Ação'));
+      box.appendChild(el('p',null,p.acao));
+      m.appendChild(box);
+    }
+    var foot=el('div','mfoot');
+    var go=el('button','btn','Abrir a aba '+d.contaLabel); go.type='button';
+    go.addEventListener('click',function(){ fecharModal(); conta=d.conta; render(); window.scrollTo(0,0); });
+    foot.appendChild(go);
+    var cl=el('button','btn','Fechar'); cl.type='button';
+    cl.addEventListener('click',fecharModal);
+    foot.appendChild(cl);
+    m.appendChild(foot);
+    ovl.appendChild(m);
+    document.body.appendChild(ovl);
+    document.body.style.overflow='hidden';
+    document.addEventListener('keydown',escHandler);
+    m.focus();
+    ovlEl=ovl;
+  }
+
+  /* ---------- aba holding ---------- */
+  function renderHolding(){
+    viewEl.innerHTML='';
+    document.documentElement.style.setProperty('--accent','#2D204E');
+    dotEl.style.background='#2D204E'; subEl.textContent='Visão consolidada da holding';
+
+    var doArr=DOCS.filter(function(d){return d.periodoLabel===periodo;});
+    var hd=el('header','head');
+    hd.appendChild(el('p','eyebrow','Fechamento semanal · Semana '+(doArr[0]&&doArr[0].semana||'—')+' de 2026'));
+    hd.appendChild(el('h1',null,'Conciliação bancária — visão da holding'));
+    hd.appendChild(el('p',null,'Confronto entre extrato bancário e contas a pagar, conta por conta. Cada fechamento fica salvo por período; use as abas acima para abrir o detalhe de cada empresa.'));
+    var mt=el('div','headmeta');
+    [['Período',periodo||'—'],['Contas fechadas',String(doArr.length)],['Emitido',doArr[0]&&doArr[0].emitido?doArr[0].emitido.split('-').reverse().join('/'):'—']]
+      .forEach(function(c){var s=el('span','chip',c[0]+' ');s.appendChild(el('b',null,c[1]));mt.appendChild(s);});
+    hd.appendChild(mt); viewEl.appendChild(hd);
+
+    if(!doArr.length){
+      var c0=card(); h2(c0,'Sem fechamentos neste período');
+      c0.appendChild(el('div','empty','Nenhuma conta foi conciliada para o período selecionado.'));
+      viewEl.appendChild(c0); return;
+    }
+
+    var tcp=0,tdif=0,treg=0,tconc=0,tpend=0,tcred=0,ncritK=0;
+    doArr.forEach(function(d){ tcp+=d.totalCP||0; tdif+=(d.diferenca||0)+(d.tarifasTotal&&!d.diferenca?d.tarifasTotal:0);
+      treg+=d.registros||0; tconc+=d.conciliados||0; tpend+=pendsDe(d).length; tcred+=d.creditos||0; ncritK+=pendsDe(d).filter(function(p){return p.tier==='crit';}).length; });
+
+    var c1=card();
+    h2(c1,'Consolidado do período','Soma das contas conciliadas em '+periodo+'.');
+    kpiBlock(c1,[
+      {k:'Contas conciliadas',v:doArr.length+' / '+doArr.length,d:'Todas fechadas no período',tone:'hero'},
+      {k:'Total pago',v:brl(tcp),d:treg+' registros de contas a pagar'},
+      {k:'Total recebido',v:brl(tcred),d:'Créditos no período'},
+      {k:'Diferença não registrada',v:brl(tdif),d:'Tarifas bancárias sem cadastro',tone:'warn'},
+      {k:'Pendências abertas',v:String(tpend),d:ncritK+' críticas · clique na lista abaixo',tone:tpend?'warn':'hero'}
+    ]);
+    var grid=el('div','contagrid');
+    doArr.forEach(function(d){
+      var b=el('div','conta'); b.tabIndex=0; b.setAttribute('role','button');
+      var t=el('div','ct'); var cd=el('span','cd'); cd.style.background=d.cor||'#2D204E';
+      t.appendChild(cd); t.appendChild(document.createTextNode(d.contaLabel)); b.appendChild(t);
+      b.appendChild(el('div','cs',d.contaDetalhe||''));
+      var g=el('div','cg');
+      [['Contas a pagar',brl(d.totalCP),''],['Conciliado',(d.conciliados||0)+'/'+(d.registros||0),''],
+       ['Saldo final',brl(d.saldoFinal),(d.saldoFinal!=null&&d.saldoFinal<20000)?'var(--crit)':''],
+       ['Diferença',brl(d.diferenca||d.tarifasTotal||0),(d.diferenca||d.tarifasTotal)?'var(--warn)':'']]
+      .forEach(function(x){
+        var w=el('div'); w.appendChild(el('div','l',x[0]));
+        var n=el('div','n',x[1]); if(x[2]) n.style.color=x[2];
+        w.appendChild(n); g.appendChild(w);
+      });
+      b.appendChild(g);
+      var pend=pendsDe(d).length;
+      b.appendChild(el('span','tag '+(pend?'t-warn':'t-ok'),pend?pend+' pendências':'Sem pendências'));
+      var go=function(){ conta=d.conta; render(); window.scrollTo(0,0); };
+      b.addEventListener('click',go);
+      b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+      grid.appendChild(b);
+    });
+    c1.appendChild(grid);
+    viewEl.appendChild(c1);
+
+    var c2=card();
+    var ncrit=doArr.reduce(function(a,d){return a+pendsDe(d).filter(function(p){return p.tier==='crit';}).length;},0);
+    h2(c2,'Pendências abertas no período',
+      tpend+' itens aguardando tratamento, '+ncrit+' deles críticos. Clique em qualquer um para ver o detalhe e a ação sugerida.');
+    doArr.forEach(function(d){
+      var lst=pendsDe(d); if(!lst.length) return;
+      var g=el('div','pendgrp');
+      var gt=el('div','gt');
+      var cd=el('span','cd'); cd.style.background=d.cor||'#2D204E';
+      gt.appendChild(cd);
+      gt.appendChild(document.createTextNode(d.contaLabel));
+      gt.appendChild(el('span','tag t-warn',String(lst.length)));
+      g.appendChild(gt);
+      var box=el('div','pendlist2');
+      lst.forEach(function(p){
+        var b=el('button','pendrow'+(p.tier==='crit'?' crit':'')); b.type='button';
+        b.appendChild(el('div','sev'));
+        var pb=el('div','pb');
+        var pt=el('div','pt');
+        pt.appendChild(document.createTextNode(p.titulo));
+        if(p.tag) pt.appendChild(el('span','tag t-'+(p.tier==='crit'?'crit':'warn'),p.tag));
+        pb.appendChild(pt);
+        if(p.acao) pb.appendChild(el('div','pd',p.acao));
+        b.appendChild(pb);
+        b.appendChild(el('div','arw','›'));
+        b.addEventListener('click',function(){ abrirModal(d,p); });
+        box.appendChild(b);
+      });
+      g.appendChild(box);
+      c2.appendChild(g);
+    });
+    viewEl.appendChild(c2);
+
+    var c3=card();
+    h2(c3,'Histórico por conta','Série de fechamentos gravados, mais recente primeiro.');
+    var tw=el('div','tw'), tb=el('table'); tb.style.minWidth='820px';
+    var th=el('thead'),htr=el('tr');
+    ['Período','Conta','Registros','Contas a pagar','Recebido','Saldo final','Diferença','Pendências']
+      .forEach(function(h,i){htr.appendChild(el('th',(i>=2)?'r':null,h));});
+    th.appendChild(htr); tb.appendChild(th);
+    var tbd=el('tbody');
+    DOCS.forEach(function(d){
+      var tr=el('tr');
+      tr.appendChild(el('td','dt',d.periodoLabel));
+      var c=el('td'); c.appendChild(el('b',null,d.contaLabel));
+      c.appendChild(el('span','note',d.contaDetalhe||'')); tr.appendChild(c);
+      tr.appendChild(el('td','r money',(d.conciliados||0)+'/'+(d.registros||0)));
+      tr.appendChild(el('td','r money',brl(d.totalCP)));
+      tr.appendChild(el('td','r money',brl(d.creditos)));
+      var sf=el('td','r money',brl(d.saldoFinal));
+      if(d.saldoFinal!=null&&d.saldoFinal<20000) sf.style.color='var(--crit)';
+      tr.appendChild(sf);
+      var df=el('td','r money',brl(d.diferenca||d.tarifasTotal||0));
+      if(d.diferenca||d.tarifasTotal) df.style.color='var(--warn)';
+      tr.appendChild(df);
+      tr.appendChild(el('td','r money',String(pendsDe(d).length)));
+      tbd.appendChild(tr);
+    });
+    tb.appendChild(tbd); tw.appendChild(tb); c3.appendChild(tw);
+    viewEl.appendChild(c3);
+  }
+
+  /* ---------- aba de conta ---------- */
+  function renderConta(){
+    viewEl.innerHTML='';
+    var d=docAtual();
+    var meta=contas().filter(function(x){return x.k===conta;})[0]||{cor:'#2D204E',lbl:conta};
+    document.documentElement.style.setProperty('--accent',meta.cor);
+    dotEl.style.background=meta.cor;
+    subEl.textContent=(d&&d.contaDetalhe)||meta.lbl;
+
+    if(!d){
+      var c0=card();
+      h2(c0,meta.lbl+' — sem fechamento neste período');
+      var e=el('div','empty');
+      e.appendChild(el('b',null,'Nada conciliado em '+periodo));
+      e.appendChild(document.createTextNode('Escolha outro período acima ou envie o extrato e o contas a pagar desta conta para o período.'));
+      c0.appendChild(e); viewEl.appendChild(c0); return;
+    }
+
+    var hd=el('header','head');
+    hd.appendChild(el('p','eyebrow','Fechamento semanal · Semana '+(d.semana||'—')+' de 2026'));
+    hd.appendChild(el('h1',null,'Extrato × Contas a pagar — '+d.contaLabel+(d.razaoSocial?'':'')));
+    hd.appendChild(el('p',null,d.chamada||''));
+    var mt=el('div','headmeta');
+    [['Período',d.periodoLabel],['Conta',(d.contaDetalhe||'').split('· ')[1]||d.contaLabel],
+     ['Emitido',(d.emitido||'').split('-').reverse().join('/')]]
+      .forEach(function(c){var s=el('span','chip',c[0]+' ');s.appendChild(el('b',null,c[1]));mt.appendChild(s);});
+    hd.appendChild(mt); viewEl.appendChild(hd);
+
+    /* resumo */
+    var c1=card();
+    h2(c1,'Resumo da conciliação',d.lancamentos+' lançamentos no extrato contra '+d.registros+' registros de contas a pagar.');
+    kpiBlock(c1,d.kpis);
+    if(d.leitura&&d.leitura.length){
+      var tw=el('div','tw'),tb=el('table');
+      var th=el('thead'),htr=el('tr');
+      ['Leitura','Registros','Valor','Situação'].forEach(function(h,i){htr.appendChild(el('th',(i===1||i===2)?'r':null,h));});
+      th.appendChild(htr);tb.appendChild(th);
+      var tbd=el('tbody');
+      d.leitura.forEach(function(l){
+        var tr=el('tr');
+        if(l.tone==='crit') tr.className='rowcrit'; else if(l.tone==='warn') tr.className='rowwarn';
+        var c=el('td'); c.appendChild(document.createTextNode(l.txt));
+        if(l.nota) c.appendChild(el('span','note',l.nota));
+        tr.appendChild(c);
+        tr.appendChild(el('td','r money',l.n));
+        tr.appendChild(el('td','r money',l.valor==null?'—':'R$ '+brl(l.valor)));
+        var s=el('td'); s.appendChild(el('span','tag t-'+(l.tone||'neutral'),l.tag)); tr.appendChild(s);
+        tbd.appendChild(tr);
+      });
+      tb.appendChild(tbd);tw.appendChild(tb);c1.appendChild(tw);
+    }
+    viewEl.appendChild(c1);
+
+    /* amarração */
+    var c2=card();
+    h2(c2,'Amarração de saldo','A conferência de que nenhum lançamento ficou de fora do período.');
+    if(d.alerta){
+      divsBlock(c2,[{tier:'crit',titulo:d.alerta.titulo,tag:d.alerta.tag,paras:d.alerta.paras,acao:d.alerta.acao}]);
+      c2.lastChild.style.marginBottom='20px';
+    }
+    amarrBlock(c2,d.amarracao);
+    if(d.saldoDia&&d.saldoDia.length){
+      var items=d.saldoDia.map(function(s){
+        var cor=s[1]<20000?'var(--crit)':(s[1]<60000?'var(--warn)':meta.cor);
+        return [s[0],s[1],cor];
+      });
+      var cap=el('p','sub','Saldo dia a dia'); cap.style.margin='22px 0 12px'; c2.appendChild(cap);
+      barsBlock(c2,items,meta.cor,null);
+    }
+    viewEl.appendChild(c2);
+
+    /* entradas */
+    if(d.entradas){
+      var c3=card();
+      h2(c3,'Entradas do período','De onde veio o dinheiro que sustentou os pagamentos da semana.');
+      kpiBlock(c3,d.entradas.kpis);
+      if(d.entradas.lojas&&d.entradas.lojas.length)
+        barsBlock(c3,d.entradas.lojas.map(function(l){return [l.loja+' ('+l.n+')',l.v];}),meta.cor,'Repasses por loja');
+      viewEl.appendChild(c3);
+    }
+
+    /* de-para */
+    var c4=card();
+    h2(c4,'De-para conciliado','Cada registro de contas a pagar e o lançamento correspondente no extrato.');
+    var temDet=d.depara.some(function(r){return r.det&&r.det.length;});
+    var temDiv=d.depara.some(function(r){return r.tone!=='ok';});
+    if(temDet){
+      var hint=el('p','hint'); hint.appendChild(el('span','disc','›'));
+      hint.appendChild(document.createTextNode('Linhas com seta abrem o detalhe das saídas consideradas — clique para expandir.'));
+      c4.appendChild(hint);
+    }
+    var rh=el('div','rowhead');
+    var info=el('span','pill'); rh.appendChild(info);
+    if(temDiv){
+      var grp=el('span'); grp.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+      ['todos','div'].forEach(function(f){
+        var b=el('button','btn',f==='todos'?'Todos':'Só divergentes'); b.type='button';
+        b.addEventListener('click',function(){draw(f==='div');});
+        grp.appendChild(b);
+      });
+      rh.appendChild(grp);
+    }
+    c4.appendChild(rh);
+    var tw2=el('div','tw'),tb2=el('table'),thd=el('thead'),h2r=el('tr');
+    ['Dt.','Fornecedor no cadastro','Centro de custo','Lançamento no extrato','Valor','Status']
+      .forEach(function(h,i){h2r.appendChild(el('th',i===4?'r':null,h));});
+    thd.appendChild(h2r);tb2.appendChild(thd);
+    var body2=el('tbody');tb2.appendChild(body2);
+    var tf=el('tfoot'),ftr=el('tr');
+    var fc=el('td',null,'Total conciliado');fc.colSpan=4;ftr.appendChild(fc);
+    ftr.appendChild(el('td','r money',brl(d.totalCP)));ftr.appendChild(el('td'));
+    tf.appendChild(ftr);tb2.appendChild(tf);
+    tw2.appendChild(tb2);c4.appendChild(tw2);
+
+    function draw(only){
+      body2.innerHTML='';
+      var n=0,soma=0;
+      d.depara.forEach(function(r){
+        if(only&&r.tone==='ok') return;
+        n++;soma+=r.v;
+        var tr=el('tr');
+        if(r.tone==='crit') tr.className='rowcrit';
+        var hasDet=!!(r.det&&r.det.length);
+        if(hasDet){tr.className+=(tr.className?' ':'')+'parent';tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-expanded','false');}
+        tr.appendChild(el('td','dt',r.dt));
+        var c=el('td');
+        var line=el('div','fornline');
+        if(hasDet) line.appendChild(el('span','disc','›'));
+        var inn=el('div'); inn.appendChild(el('b',null,r.f));
+        if(r.nota) inn.appendChild(el('span','note',r.nota));
+        line.appendChild(inn); c.appendChild(line); tr.appendChild(c);
+        tr.appendChild(el('td',null,r.cc));
+        var e=el('td'); e.appendChild(document.createTextNode(r.ext));
+        if(r.extDoc) e.appendChild(el('span','note',r.extDoc));
+        tr.appendChild(e);
+        tr.appendChild(el('td','r money',brl(r.v)));
+        var s=el('td'); s.appendChild(el('span','tag t-'+r.tone,r.tag)); tr.appendChild(s);
+        body2.appendChild(tr);
+        if(hasDet){
+          var ctr=el('tr','child'); ctr.hidden=true;
+          var ctd=el('td'); ctd.colSpan=6;
+          var dr=el('div','drill');
+          dr.appendChild(el('h5',null,'Saídas consideradas'));
+          if(r.how) dr.appendChild(el('p','how',r.how));
+          var dt2=el('table','dtab'),dtb=el('tbody'),sm=0;
+          r.det.forEach(function(x){
+            sm+=x.v;
+            var row=el('tr');
+            row.appendChild(el('td',null,x.d));
+            row.appendChild(el('td','dt',x.doc));
+            var v=el('td','r money',(x.v<0?'− ':'')+brl(Math.abs(x.v)));
+            if(x.v<0) v.style.color='var(--ok)';
+            row.appendChild(v); dtb.appendChild(row);
+          });
+          var tot=el('tr','dtot');
+          tot.appendChild(el('td',null,r.det.length+' saídas consideradas'));
+          tot.appendChild(el('td','dt','= registro de '+brl(r.v)));
+          tot.appendChild(el('td','r money',brl(Math.round(sm*100)/100)));
+          dtb.appendChild(tot); dt2.appendChild(dtb); dr.appendChild(dt2);
+          ctd.appendChild(dr); ctr.appendChild(ctd); body2.appendChild(ctr);
+          var tg=function(){
+            var op=ctr.hidden; ctr.hidden=!op;
+            tr.classList.toggle('open',op); tr.setAttribute('aria-expanded',op?'true':'false');
+          };
+          tr.addEventListener('click',tg);
+          tr.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();tg();}});
+        }
+      });
+      info.textContent=n+' registros · R$ '+brl(Math.round(soma*100)/100);
+    }
+    draw(false);
+    viewEl.appendChild(c4);
+
+    /* sem registro */
+    if(d.semRegistro&&d.semRegistro.length){
+      var c5=card();
+      var tot=d.semRegistro.reduce(function(a,x){return a+x.v;},0);
+      h2(c5,'Lançamentos sem registro no contas a pagar',
+        d.semRegistro.length+' lançamento(s) somando R$ '+brl(Math.round(tot*100)/100)+' — é a diferença da semana.');
+      var tw3=el('div','tw'),tb3=el('table');tb3.style.minWidth='520px';
+      var th3=el('thead'),h3r=el('tr');
+      ['Data','Descrição','Valor','Natureza'].forEach(function(h,i){h3r.appendChild(el('th',i===2?'r':null,h));});
+      th3.appendChild(h3r);tb3.appendChild(th3);
+      var tbd3=el('tbody');
+      d.semRegistro.forEach(function(x){
+        var tr=el('tr','rowcrit');
+        tr.appendChild(el('td','dt',x.dt));
+        tr.appendChild(el('td',null,x.d));
+        tr.appendChild(el('td','r money',brl(x.v)));
+        tr.appendChild(el('td',null,x.nat||'Tarifa'));
+        tbd3.appendChild(tr);
+      });
+      tb3.appendChild(tbd3);
+      var tf3=el('tfoot'),f3=el('tr');
+      f3.style.cssText='background:var(--crit-soft);color:var(--crit)';
+      f3.appendChild(el('td',null,'Total'));f3.appendChild(el('td',null,'Diferença da semana'));
+      f3.appendChild(el('td','r money',brl(Math.round(tot*100)/100)));f3.appendChild(el('td'));
+      tf3.appendChild(f3);tb3.appendChild(tf3);
+      tw3.appendChild(tb3);c5.appendChild(tw3);
+      viewEl.appendChild(c5);
+    }
+
+    /* anexos */
+    (d.anexos||[]).forEach(function(a){
+      var c=card(); h2(c,a.titulo,a.sub);
+      var tw4=el('div','tw'),tb4=el('table');tb4.style.minWidth='860px';
+      var th4=el('thead'),h4=el('tr');
+      a.cols.forEach(function(x,i){h4.appendChild(el('th',(a.aligns&&a.aligns[i]==='r')?'r':null,x));});
+      th4.appendChild(h4);tb4.appendChild(th4);
+      var tbd4=el('tbody');
+      a.rows.forEach(function(row){
+        var tr=el('tr');
+        row.forEach(function(cell,i){
+          if(i===row.length-1&&String(cell).indexOf(':')>0){
+            var parts=String(cell).split(':');
+            if(parts[0]==='crit') tr.className='rowcrit';
+            var td=el('td'); td.appendChild(el('span','tag t-'+parts[0],parts[1])); tr.appendChild(td);
+          } else {
+            tr.appendChild(el('td',(a.aligns&&a.aligns[i]==='r')?'r money':null,cell));
+          }
+        });
+        tbd4.appendChild(tr);
+      });
+      tb4.appendChild(tbd4);
+      if(a.foot){
+        var tf4=el('tfoot'),f4=el('tr');
+        a.foot.forEach(function(cell,i){f4.appendChild(el('td',(a.aligns&&a.aligns[i]==='r')?'r money':null,cell));});
+        tf4.appendChild(f4);tb4.appendChild(tf4);
+      }
+      tw4.appendChild(tb4);c.appendChild(tw4);
+      viewEl.appendChild(c);
+    });
+
+    /* divergências */
+    if(d.divergencias&&d.divergencias.length){
+      var c6=card();
+      h2(c6,'Pontos de atenção',d.divergencias.length+' pontos levantados no fechamento desta conta.');
+      divsBlock(c6,d.divergencias);
+      viewEl.appendChild(c6);
+    }
+
+    /* histórico da conta */
+    var c7=card();
+    var serie=DOCS.filter(function(x){return x.conta===conta;});
+    h2(c7,'Histórico da conta',serie.length+(serie.length===1?' fechamento gravado.':' fechamentos gravados.'));
+    var tw5=el('div','tw'),tb5=el('table');tb5.style.minWidth='760px';
+    var th5=el('thead'),h5=el('tr');
+    ['Período','Registros','Contas a pagar','Recebido','Saldo final','Diferença','Pendências','Status']
+      .forEach(function(h,i){h5.appendChild(el('th',(i>=1&&i<=6)?'r':null,h));});
+    th5.appendChild(h5);tb5.appendChild(th5);
+    var tbd5=el('tbody');
+    serie.forEach(function(x){
+      var tr=el('tr');
+      if(x.periodoLabel===periodo) tr.style.background='var(--accent-soft)';
+      tr.appendChild(el('td','dt',x.periodoLabel));
+      tr.appendChild(el('td','r money',(x.conciliados||0)+'/'+(x.registros||0)));
+      tr.appendChild(el('td','r money',brl(x.totalCP)));
+      tr.appendChild(el('td','r money',brl(x.creditos)));
+      var sf=el('td','r money',brl(x.saldoFinal));
+      if(x.saldoFinal!=null&&x.saldoFinal<20000) sf.style.color='var(--crit)';
+      tr.appendChild(sf);
+      var df=el('td','r money',brl(x.diferenca||x.tarifasTotal||0));
+      if(x.diferenca||x.tarifasTotal) df.style.color='var(--warn)';
+      tr.appendChild(df);
+      tr.appendChild(el('td','r money',String(pendsDe(x).length)));
+      var st=el('td');
+      var ok=x.conciliados===x.registros;
+      st.appendChild(el('span','tag '+(ok?'t-ok':'t-warn'),ok?'Fechado':'Em aberto'));
+      tr.appendChild(st);
+      tbd5.appendChild(tr);
+    });
+    tb5.appendChild(tbd5);tw5.appendChild(tb5);c7.appendChild(tw5);
+    if(serie.length>1)
+      barsBlock(c7,serie.slice().reverse().map(function(x){return [x.periodoLabel,x.totalCP||0];}),meta.cor,null);
+    viewEl.appendChild(c7);
+
+    /* whatsapp */
+    if(d.wpp){
+      var c8=card();
+      h2(c8,'Resumo para WhatsApp','Texto pronto para mandar no grupo ou para o Rapha.');
+      var box=el('div','wppbox');
+      var btn=el('button','btn copybtn','Copiar'); btn.type='button';
+      var pre=el('pre',null,d.wpp);
+      btn.addEventListener('click',function(){
+        var done=function(){btn.textContent='Copiado';setTimeout(function(){btn.textContent='Copiar';},1800);};
+        if(navigator.clipboard&&navigator.clipboard.writeText)
+          navigator.clipboard.writeText(pre.innerText).then(done).catch(function(){btn.textContent='Selecione e copie';});
+        else{
+          var r=document.createRange();r.selectNodeContents(pre);
+          var s=window.getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecionado';
+        }
+      });
+      box.appendChild(btn);box.appendChild(pre);c8.appendChild(box);
+      viewEl.appendChild(c8);
+    }
+  }
+
+  function renderTabs(){
+    tabsEl.innerHTML='';
+    var t0=el('button','tab'+(conta==='holding'?' on':''),'Holding'); t0.type='button';
+    t0.addEventListener('click',function(){conta='holding';render();});
+    tabsEl.appendChild(t0);
+    contas().forEach(function(c){
+      var b=el('button','tab'+(conta===c.k?' on':'')); b.type='button';
+      var d=el('span','bul'); d.style.background=c.cor; d.style.opacity='1';
+      b.appendChild(d); b.appendChild(document.createTextNode(c.lbl));
+      b.addEventListener('click',function(){conta=c.k;render();});
+      tabsEl.appendChild(b);
+    });
+    perEl.innerHTML=''; perEl.appendChild(el('span','plabel','Período'));
+    periodos().forEach(function(p){
+      var b=el('button','per'+(periodo===p.lbl?' on':''),p.lbl); b.type='button';
+      b.addEventListener('click',function(){periodo=p.lbl;render();});
+      perEl.appendChild(b);
+    });
+  }
+
+  function render(){
+    fecharModal();
+    renderTabs();
+    if(conta==='holding') renderHolding(); else renderConta();
+  }
+
+  function bootEmpty(){
+    tabsEl.innerHTML=''; 
+    var t=el('button','tab on','Holding'); t.type='button'; tabsEl.appendChild(t);
+    var c=card();
+    h2(c,'Conciliação bancária semanal do Grupo Ragga');
+    var e=el('div','empty');
+    e.appendChild(el('b',null,'Nenhum fechamento gravado ainda'));
+    e.appendChild(document.createTextNode('Cada conta conciliada aparece como uma aba aqui, com os períodos salvos lado a lado.'));
+    c.appendChild(e); viewEl.appendChild(c);
+  }
+  bootEmpty();
+
+  DOCS = (typeof SEED !== 'undefined' ? SEED : []).slice().sort(function(a,b){
+    return (b.ordem||0)-(a.ordem||0) || String(a.conta).localeCompare(String(b.conta));
+  });
+  if(DOCS.length){
+    statusEl.className='pill live';
+    statusEl.textContent=DOCS.length+(DOCS.length===1?' fechamento salvo':' fechamentos salvos');
+    periodo=periodos()[0].lbl;
+    render();
+  }
+})();
+</script>
+
+</body>
+</html>
